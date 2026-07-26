@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="site-title">Éclats d'Instants — Photographie de mariages & événements</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  color: #1A1A1A;
+  background: #FAF8F5;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+img { display: block; max-width: 100%; height: auto; }
+a { text-decoration: none; color: inherit; }
+button { font: inherit; cursor: pointer; border: none; background: none; }
+ul { list-style: none; }
+:focus-visible { outline: 2px solid #C4A06A; outline-offset: 4px; }
+::selection { background: #C4A06A; color: #fff; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 28px; }
+.section { padding: 140px 0; }
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #C4A06A;
+  margin-bottom: 16px;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 500;
+  color: #1A1A1A;
+  line-height: 1.15;
+  margin-bottom: 20px;
+}
+.section-desc {
+  color: #6B6B6B;
+  font-size: 0.95rem;
+  max-width: 520px;
+  line-height: 1.7;
+}
+.gold { color: #C4A06A; }
+.italic { font-style: italic; }
+
+/* === SKIP LINK === */
+.skip-link {
+  position: absolute;
+  top: -100%; left: 16px;
+  z-index: 10000;
+  padding: 12px 24px;
+  background: #C4A06A; color: #fff;
+  font-weight: 600; font-size: 0.85rem;
+}
+.skip-link:focus { top: 16px; }
+
+/* === NAV === */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 1000;
+  padding: 24px 40px;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: background 0.4s, padding 0.3s, box-shadow 0.3s, opacity 0.6s;
+  opacity: 0;
+}
+nav.nav-visible { opacity: 1; }
+.nav-center a, .nav-right, .nav-toggle {
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.nav-visible .nav-center a,
+.nav-visible .nav-right,
+.nav-visible .nav-toggle {
+  opacity: 1;
+  transform: translateY(0);
+}
+.nav-visible .nav-center a:nth-child(1) { transition-delay: 0.10s; }
+.nav-visible .nav-center a:nth-child(2) { transition-delay: 0.15s; }
+.nav-visible .nav-center a:nth-child(3) { transition-delay: 0.20s; }
+.nav-visible .nav-center a:nth-child(4) { transition-delay: 0.25s; }
+.nav-visible .nav-center a:nth-child(5) { transition-delay: 0.30s; }
+.nav-visible .nav-right { transition-delay: 0.35s; }
+.nav-visible .nav-toggle { transition-delay: 0.35s; }
+nav.scrolled {
+  background: rgba(10,10,10,0.92);
+  backdrop-filter: blur(16px);
+  padding: 16px 40px;
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+.nav-center { display: flex; gap: 36px; align-items: center; }
+.nav-center a {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  transition: color 0.3s;
+  position: relative;
+  padding: 4px 0;
+}
+.nav-center a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  width: 0; height: 1.5px;
+  background: #C4A06A;
+  transition: width 0.3s;
+}
+.nav-center a:hover { color: #fff; }
+.nav-center a:hover::after { width: 100%; }
+.nav-right { display: flex; align-items: center; gap: 20px; }
+.lang-btn {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 5px 9px;
+  color: rgba(255,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: all 0.3s;
+  letter-spacing: 0.05em;
+}
+.lang-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+.lang-btn.active { color: #fff; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.25); }
+.nav-cta {
+  padding: 8px 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: #fff;
+  border: 1px solid #C4A06A;
+  transition: all 0.3s;
+}
+.nav-cta:hover { background: #C4A06A; color: #0A0A0A; }
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: 4px;
+  z-index: 1001;
+}
+.nav-toggle span {
+  display: block;
+  width: 24px; height: 2px;
+  background: #fff;
+  transition: all 0.3s;
+  border-radius: 1px;
+}
+.nav-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.nav-toggle.active span:nth-child(2) { opacity: 0; }
+.nav-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+.mobile-menu {
+  display: none;
+  position: fixed; inset: 0;
+  background: #0A0A0A;
+  z-index: 999;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 32px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s;
+}
+.mobile-menu.open { opacity: 1; pointer-events: all; }
+.mobile-menu a {
+  color: rgba(255,255,255,0.85);
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: 'Playfair Display', serif;
+}
+.mobile-menu .lang-switch-mobile { display: flex; gap: 12px; margin-top: 12px; }
+@media (max-width: 900px) {
+  nav { padding: 18px 24px; }
+  nav.scrolled { padding: 12px 24px; }
+  .nav-center, .nav-right .lang-btn, .nav-right .nav-cta { display: none; }
+  .nav-toggle { display: flex; }
+  .mobile-menu { display: flex; }
+  .nav-right { gap: 0; }
+}
+
+/* === HERO === */
+.hero {
+  height: 100vh;
+  min-height: 680px;
+  position: relative;
+  overflow: hidden;
+  background: #0A0A0A;
+}
+.hero-slides { position: absolute; inset: 0; }
+.hero-slides img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.4s ease, transform 0.3s;
+}
+.hero-slides img.active { opacity: 1; }
+.hero-slides img.ken-burns {
+  animation: kenBurns 8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+@keyframes kenBurns {
+  0%   { transform: scale(1); }
+  100% { transform: scale(1.06); }
+}
+.hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
+  z-index: 1;
+}
+.hero-grain {
+  position: absolute; inset: 0; z-index: 2;
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 400px 400px;
+  pointer-events: none;
+}
+.hero-content {
+  position: relative; z-index: 3;
+  height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 24px;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 18px;
+  border: 1px solid rgba(255,255,255,0.12);
+  font-size: 0.65rem; font-weight: 500; letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 32px;
+  backdrop-filter: blur(4px);
+}
+.hero-badge::before {
+  content: '';
+  width: 5px; height: 5px;
+  background: #C4A06A;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.05;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+.hero p {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.55);
+  font-weight: 300;
+  max-width: 480px;
+  margin: 0 auto 40px;
+  line-height: 1.7;
+}
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.hero-btn {
+  padding: 14px 36px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: #fff;
+  border: 1px solid #C4A06A;
+  transition: all 0.3s;
+}
+.hero-btn:hover { background: #C4A06A; color: #0A0A0A; }
+.hero-btn-outline {
+  padding: 14px 36px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: all 0.3s;
+}
+.hero-btn-outline:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+.hero-scroll {
+  position: absolute; bottom: 36px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: rgba(255,255,255,0.25);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.hero-scroll-line {
+  width: 1px; height: 36px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.25), transparent);
+  animation: scrollPulse 2.5s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%, 100% { transform: scaleY(1); opacity: 1; }
+  50% { transform: scaleY(0.6); opacity: 0.3; }
+}
+
+/* === ABOUT === */
+#about { background: #FAF8F5; }
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.about-image { position: relative; }
+.about-image img {
+  width: 100%;
+  height: 560px;
+  object-fit: cover;
+}
+.about-image::after {
+  content: '';
+  position: absolute;
+  bottom: -16px; right: -16px;
+  width: 120px; height: 120px;
+  border: 2px solid #C4A06A;
+  z-index: -1;
+}
+.about-text .section-title { margin-bottom: 24px; }
+.about-text p {
+  color: #6B6B6B;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+.about-signature {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: #C4A06A;
+  margin-top: 24px;
+}
+@media (max-width: 768px) {
+  .about-grid { grid-template-columns: 1fr; gap: 40px; }
+  .about-image img { height: 340px; }
+  .about-image::after { width: 80px; height: 80px; bottom: -10px; right: -10px; }
+}
+
+/* === GALLERY === */
+#gallery { background: #FAF8F5; padding-top: 0; }
+.gallery-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 48px; flex-wrap: wrap; gap: 24px; }
+.filter-bar { display: flex; gap: 4px; flex-wrap: wrap; }
+.filter-btn {
+  padding: 8px 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #8C8C8C;
+  border: 1px solid #E5DDD1;
+  transition: all 0.3s;
+  background: transparent;
+}
+.filter-btn:hover { color: #1A1A1A; border-color: #1A1A1A; }
+.filter-btn.active { background: #1A1A1A; color: #fff; border-color: #1A1A1A; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.grid-item {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  aspect-ratio: 1;
+  background: #EFE9E0;
+  clip-path: circle(0% at 50% 50%);
+  transition: clip-path 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: clip-path;
+}
+.grid-item.aperture-visible {
+  clip-path: circle(100% at 50% 50%);
+}
+.grid-item.tall { grid-row: span 2; aspect-ratio: auto; }
+.grid-item.wide { grid-column: span 2; }
+.grid-item img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease, filter 0.5s ease;
+  will-change: transform;
+}
+.grid-item:hover img { transform: scale(1.06); }
+.grid-item .overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+}
+.grid-item:hover .overlay { opacity: 1; }
+.grid-item .overlay span {
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+@media (max-width: 768px) {
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .grid-item.tall, .grid-item.wide { grid-row: span 1; grid-column: span 1; }
+  .gallery-header { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 480px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+/* === LIGHTBOX === */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0,0,0,0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.lightbox.open { opacity: 1; pointer-events: all; }
+.lightbox img {
+  max-width: 85vw;
+  max-height: 88vh;
+  object-fit: contain;
+  transform: scale(0.93);
+  filter: blur(4px);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
+}
+.lightbox.open img {
+  transform: scale(1);
+  filter: blur(0);
+}
+.lightbox-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255,255,255,0.3);
+  font-size: 2.5rem;
+  padding: 16px;
+  transition: color 0.3s;
+  line-height: 1;
+}
+.lightbox-btn:hover { color: #fff; }
+.lightbox-prev { left: 16px; }
+.lightbox-next { right: 16px; }
+.lightbox-close {
+  position: absolute;
+  top: 20px; right: 24px;
+  color: rgba(255,255,255,0.4);
+  font-size: 1.8rem;
+  transition: color 0.3s;
+  padding: 8px;
+  line-height: 1;
+}
+.lightbox-close:hover { color: #fff; }
+.lightbox-counter {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.35);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+}
+@media (max-width: 768px) {
+  .lightbox-btn { font-size: 1.6rem; padding: 12px; }
+  .lightbox-prev { left: 4px; }
+  .lightbox-next { right: 4px; }
+  .lightbox img { max-width: 92vw; }
+}
+
+/* === STATS === */
+.stats { background: #0A0A0A; padding: 100px 0; }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  text-align: center;
+}
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem;
+  font-weight: 500;
+  color: #C4A06A;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.stat-label {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.4);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+@media (max-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 40px; }
+  .stat-num { font-size: 2.2rem; }
+}
+
+/* === PRICING === */
+#pricing { background: #F3EFE8; }
+.pricing .section-title { margin-bottom: 12px; }
+.pricing .section-desc { margin-bottom: 56px; }
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.pricing-card {
+  background: #fff;
+  padding: 44px 36px;
+  position: relative;
+  transition: transform 0.4s, box-shadow 0.4s;
+}
+.pricing-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.06);
+}
+.pricing-card.featured {
+  background: #1A1A1A;
+  color: #fff;
+}
+.pricing-card.featured:hover {
+  box-shadow: 0 24px 48px rgba(0,0,0,0.18);
+}
+.pricing-card .badge {
+  position: absolute;
+  top: -11px; left: 50%;
+  transform: translateX(-50%);
+  background: #C4A06A; color: #fff;
+  font-size: 0.6rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 6px 18px;
+}
+.pricing-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.pricing-card .price {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.6rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.pricing-card .price-sub {
+  font-size: 0.8rem;
+  color: #8C8C8C;
+  margin-bottom: 28px;
+}
+.pricing-card.featured .price-sub { color: rgba(255,255,255,0.4); }
+.pricing-card ul { margin-bottom: 32px; }
+.pricing-card li {
+  padding: 8px 0;
+  font-size: 0.85rem;
+  color: #6B6B6B;
+  border-bottom: 1px solid #F0EDE8;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pricing-card li::before {
+  content: '';
+  width: 4px; height: 4px;
+  background: #C4A06A;
+  flex-shrink: 0;
+}
+.pricing-card.featured li { color: rgba(255,255,255,0.55); border-color: rgba(255,255,255,0.06); }
+.pricing-card.featured li::before { background: #C4A06A; }
+.pricing-card .btn {
+  display: block;
+  text-align: center;
+  padding: 13px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  border: 1px solid #1A1A1A;
+  transition: all 0.3s;
+}
+.pricing-card .btn:hover { background: #1A1A1A; color: #fff; }
+.pricing-card.featured .btn { border-color: #C4A06A; color: #C4A06A; }
+.pricing-card.featured .btn:hover { background: #C4A06A; color: #1A1A1A; }
+@media (max-width: 768px) {
+  .pricing-grid { grid-template-columns: 1fr; gap: 20px; }
+  .pricing-card.featured { transform: none; }
+}
+
+/* === TESTIMONIALS === */
+#testimonials { background: #FAF8F5; }
+.testimonials .section-title { margin-bottom: 56px; }
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.testimonial-card {
+  padding: 36px 32px;
+  background: #fff;
+  border: 1px solid #EFE9E0;
+  position: relative;
+}
+.testimonial-card::before {
+  content: '"';
+  font-family: 'Playfair Display', serif;
+  font-size: 4rem;
+  line-height: 1;
+  color: #C4A06A;
+  opacity: 0.2;
+  position: absolute;
+  top: 14px; left: 24px;
+}
+.testimonial-card blockquote {
+  font-size: 0.92rem;
+  color: #4A4A4A;
+  line-height: 1.75;
+  margin-bottom: 24px;
+  font-style: italic;
+  position: relative;
+  z-index: 1;
+}
+.testimonial-author { display: flex; align-items: center; gap: 12px; }
+.testimonial-author img {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.testimonial-author strong { display: block; font-size: 0.85rem; font-weight: 600; }
+.testimonial-author span { font-size: 0.75rem; color: #8C8C8C; }
+.stars { color: #C4A06A; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 12px; }
+@media (max-width: 768px) {
+  .testimonials-grid { grid-template-columns: 1fr; }
+}
+
+/* === VIDEOS === */
+#videos { background: #F3EFE8; }
+.videos .section-title { margin-bottom: 48px; }
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.video-card {
+  position: relative;
+  aspect-ratio: 16/9;
+  background: #1A1A1A;
+  overflow: hidden;
+  cursor: pointer;
+}
+.video-card img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s, filter 0.5s;
+  filter: brightness(0.65);
+}
+.video-card:hover img { transform: scale(1.06); filter: brightness(0.4); }
+.video-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.video-play svg {
+  width: 52px; height: 52px;
+  fill: #fff;
+  opacity: 0.75;
+  transition: transform 0.4s, opacity 0.3s;
+}
+.video-card:hover .video-play svg { transform: scale(1.12); opacity: 1; }
+.video-card .label {
+  position: absolute;
+  bottom: 16px; left: 16px;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+@media (max-width: 768px) {
+  .video-grid { grid-template-columns: 1fr; }
+}
+
+/* === CONTACT === */
+#contact { background: #FAF8F5; }
+.contact .section-title { margin-bottom: 8px; }
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: start;
+  margin-top: 56px;
+}
+.contact-info h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+.contact-info p {
+  color: #6B6B6B;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+.contact-detail {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  font-size: 0.9rem;
+  color: #4A4A4A;
+}
+.contact-detail svg {
+  width: 18px; height: 18px;
+  stroke: #C4A06A;
+  stroke-width: 1.5;
+  fill: none;
+  flex-shrink: 0;
+}
+.form-group { margin-bottom: 20px; position: relative; }
+.form-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #4A4A4A;
+  letter-spacing: 0.03em;
+}
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1px solid #E5DDD1;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  background: #fff;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #C4A06A;
+  box-shadow: 0 0 0 3px rgba(196,160,106,0.08);
+}
+.form-group textarea { resize: vertical; min-height: 120px; }
+.submit-btn {
+  padding: 14px 40px;
+  background: #1A1A1A;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  transition: background 0.3s;
+}
+.submit-btn:hover { background: #C4A06A; }
+@media (max-width: 768px) {
+  .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+
+/* === FOOTER === */
+footer {
+  background: #0A0A0A;
+  color: rgba(255,255,255,0.35);
+  padding: 64px 0 40px;
+  text-align: center;
+}
+footer .logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.8);
+  display: inline-block;
+  margin-bottom: 12px;
+}
+footer p { font-size: 0.75rem; line-height: 1.6; }
+.footer-social { display: flex; justify-content: center; gap: 20px; margin-bottom: 24px; }
+.footer-social a { color: rgba(255,255,255,0.25); transition: color 0.3s; }
+.footer-social a:hover { color: #C4A06A; }
+.footer-social svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+
+/* === FLOATING CTA === */
+.float-cta {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  z-index: 900;
+  width: 52px; height: 52px;
+  background: #C4A06A;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(196,160,106,0.3);
+  transition: transform 0.3s, box-shadow 0.3s;
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+}
+.float-cta.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+.float-cta:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 28px rgba(196,160,106,0.4); }
+.float-cta svg { width: 20px; height: 20px; stroke: #fff; stroke-width: 1.8; fill: none; }
+
+/* === REVEAL === */
+.reveal { opacity: 0; transform: translateY(36px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.1s; }
+.reveal-d2 { transition-delay: 0.2s; }
+.reveal-d3 { transition-delay: 0.3s; }
+.reveal-d4 { transition-delay: 0.4s; }
+
+/* === REDUCED MOTION === */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; }
+  .grid-item { clip-path: none; }
+  .hero-slides img.ken-burns { animation: none; }
+  .lightbox img { transform: none; filter: none; }
+  nav { opacity: 1; }
+  .nav-center a, .nav-right, .nav-toggle { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link" data-i18n="skip-link">Aller au contenu</a>
+
+<!-- NAV -->
+<nav role="navigation" aria-label="Navigation principale">
+  <a href="#" class="nav-logo">Éclats d'Instants</a>
+  <div class="nav-center">
+    <a href="#gallery" data-i18n="nav-gallery">Galerie</a>
+    <a href="#pricing" data-i18n="nav-pricing">Prestations</a>
+    <a href="#testimonials" data-i18n="nav-testimonials">Témoignages</a>
+    <a href="#videos" data-i18n="nav-videos">Vidéos</a>
+    <a href="#contact" data-i18n="nav-contact">Contact</a>
+  </div>
+  <div class="nav-right">
+    <button class="lang-btn active" data-lang="fr" aria-label="Français">FR</button>
+    <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
+    <a href="#contact" class="nav-cta" data-i18n="nav-cta">Devis gratuit</a>
+  </div>
+  <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" role="dialog" aria-modal="true">
+  <a href="#gallery" data-i18n="nav-gallery">Galerie</a>
+  <a href="#pricing" data-i18n="nav-pricing">Prestations</a>
+  <a href="#testimonials" data-i18n="nav-testimonials">Témoignages</a>
+  <a href="#videos" data-i18n="nav-videos">Vidéos</a>
+  <a href="#contact" data-i18n="nav-contact">Contact</a>
+  <div class="lang-switch-mobile">
+    <button class="lang-btn active" data-lang="fr" aria-label="Français">FR</button>
+    <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" aria-label="Accueil">
+  <div class="hero-slides">
+    <img src="https://picsum.photos/seed/wedding-hero2/1600/1000" alt="" class="active">
+    <img src="https://picsum.photos/seed/event-hero2/1600/1000" alt="">
+    <img src="https://picsum.photos/seed/portrait-hero2/1600/1000" alt="">
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-grain"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span data-i18n="hero-badge">Photographe de mariages & événements</span></div>
+    <h1><span class="italic">Éclats</span> <span class="gold">d'Instants</span></h1>
+    <p data-i18n="hero-desc">Des souvenirs authentiques, capturés avec émotion — pour que chaque regard, chaque sourire, chaque instant reste gravé.</p>
+    <div class="hero-actions">
+      <a href="#gallery" class="hero-btn" data-i18n="hero-btn">Voir mon travail</a>
+      <a href="#contact" class="hero-btn-outline" data-i18n="hero-btn-alt">Me contacter</a>
+    </div>
+  </div>
+  <div class="hero-scroll" aria-hidden="true">
+    <span data-i18n="scroll">Scroll</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
+
+<main id="main">
+
+<!-- ABOUT -->
+<section id="about" class="section" aria-label="À propos">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-image reveal">
+        <img src="https://picsum.photos/seed/photographer2/700/560" alt="Thomas — Photographe">
+      </div>
+      <div class="about-text">
+        <p class="section-label reveal" data-i18n="about-label">À propos</p>
+        <h2 class="section-title reveal" data-i18n="about-title">Derrière <span class="gold">l'objectif</span></h2>
+        <p class="reveal" data-i18n="about-p1">Passionné par l'art de capturer les émotions brutes, je parcours la région Auvergne-Rhône-Alpes pour immortaliser vos plus beaux moments. Mariages, anniversaires, portraits — chaque séance est une histoire à raconter.</p>
+        <p class="reveal" data-i18n="about-p2">Mon approche est discrète mais attentive. Je ne cherche pas à mettre en scène, mais à saisir l'authenticité de chaque instant. La lumière naturelle, les sourires complices, les regards échangés — voilà ce qui donne vie à mes images.</p>
+        <p class="about-signature reveal">— Thomas</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" class="section" aria-label="Galerie photo">
+  <div class="container">
+    <p class="section-label reveal" data-i18n="gallery-label">Portfolio</p>
+    <div class="gallery-header">
+      <h2 class="section-title reveal" data-i18n="gallery-title" style="margin-bottom:0;">Galerie</h2>
+      <div class="filter-bar reveal" role="tablist" aria-label="Filtrer par catégorie">
+        <button class="filter-btn active" role="tab" aria-selected="true" data-filter="all" data-i18n="filter-all">Tous</button>
+        <button class="filter-btn" role="tab" aria-selected="false" data-filter="mariage" data-i18n="filter-wedding">Mariages</button>
+        <button class="filter-btn" role="tab" aria-selected="false" data-filter="anniversaire" data-i18n="filter-birthday">Anniversaires</button>
+        <button class="filter-btn" role="tab" aria-selected="false" data-filter="portrait" data-i18n="filter-portrait">Portraits</button>
+      </div>
+    </div>
+    <div class="grid" id="gallery-grid" role="list"></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats" aria-label="Statistiques">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="reveal"><div class="stat-num" data-count="200">0</div><div class="stat-label" data-i18n="stat-1">Mariages capturés</div></div>
+      <div class="reveal"><div class="stat-num" data-count="500">0</div><div class="stat-label" data-i18n="stat-2">Événements immortalisés</div></div>
+      <div class="reveal"><div class="stat-num" data-count="12">0</div><div class="stat-label" data-i18n="stat-3">Années d'expérience</div></div>
+      <div class="reveal"><div class="stat-num" data-count="100">0</div><div class="stat-label" data-i18n="stat-4">Clients satisfaits</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="section" aria-label="Prestations et tarifs">
+  <div class="container">
+    <p class="section-label reveal" data-i18n="pricing-label">Forfaits</p>
+    <h2 class="section-title reveal" data-i18n="pricing-title">Prestations</h2>
+    <p class="section-desc reveal" data-i18n="pricing-desc">Des formules pensées pour chaque projet, avec la même exigence de qualité.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card reveal reveal-d1">
+        <h3 data-i18n="plan-essential">Essentiel</h3>
+        <div class="price">350€</div>
+        <div class="price-sub" data-i18n="plan-essential-sub">Petits événements</div>
+        <ul>
+          <li data-i18n="plan-essential-1">2h de couverture photo</li>
+          <li data-i18n="plan-essential-2">50 photos retouchées</li>
+          <li data-i18n="plan-essential-3">Galerie privée en ligne</li>
+          <li data-i18n="plan-essential-4">Livraison sous 7 jours</li>
+        </ul>
+        <a href="#contact" class="btn" data-i18n="plan-book">Réserver</a>
+      </div>
+      <div class="pricing-card featured reveal reveal-d2">
+        <div class="badge" data-i18n="plan-badge">Recommandé</div>
+        <h3>Premium</h3>
+        <div class="price">890€</div>
+        <div class="price-sub" data-i18n="plan-premium-sub">Mariages & grands événements</div>
+        <ul>
+          <li data-i18n="plan-premium-1">6h de couverture photo & vidéo</li>
+          <li data-i18n="plan-premium-2">200+ photos retouchées</li>
+          <li data-i18n="plan-premium-3">Vidéo highlight 3 min</li>
+          <li data-i18n="plan-premium-4">Galerie privée en ligne</li>
+          <li data-i18n="plan-premium-5">Album photo 30 pages</li>
+          <li data-i18n="plan-premium-6">Livraison sous 14 jours</li>
+        </ul>
+        <a href="#contact" class="btn" data-i18n="plan-book">Réserver</a>
+      </div>
+      <div class="pricing-card reveal reveal-d3">
+        <h3 data-i18n="plan-custom">Sur Mesure</h3>
+        <div class="price" data-i18n="plan-custom-price">Sur devis</div>
+        <div class="price-sub" data-i18n="plan-custom-sub">Événements sur plusieurs jours</div>
+        <ul>
+          <li data-i18n="plan-custom-1">Couverture complète</li>
+          <li data-i18n="plan-custom-2">Photos en nombre illimité</li>
+          <li data-i18n="plan-custom-3">Vidéo longue durée</li>
+          <li data-i18n="plan-custom-4">Album premium 50 pages</li>
+          <li data-i18n="plan-custom-5">Drone / vidéo aérienne</li>
+          <li data-i18n="plan-custom-6">Livraison prioritaire</li>
+        </ul>
+        <a href="#contact" class="btn" data-i18n="plan-contact">Me contacter</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="section" aria-label="Témoignages clients">
+  <div class="container">
+    <p class="section-label reveal" data-i18n="testimonials-label">Ils m'ont fait confiance</p>
+    <h2 class="section-title reveal" data-i18n="testimonials-title">Témoignages</h2>
+    <div class="testimonials-grid" id="testimonials-grid"></div>
+  </div>
+</section>
+
+<!-- VIDEOS -->
+<section id="videos" class="section" aria-label="Vidéos">
+  <div class="container">
+    <p class="section-label reveal" data-i18n="videos-label">Motion</p>
+    <h2 class="section-title reveal" data-i18n="videos-title">Vidéos</h2>
+    <div class="video-grid" id="video-grid"></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="section" aria-label="Contact">
+  <div class="container">
+    <p class="section-label reveal" data-i18n="contact-label">Contact</p>
+    <h2 class="section-title reveal" data-i18n="contact-title">Travaillons <span class="gold">ensemble</span></h2>
+    <p class="section-desc reveal" data-i18n="contact-desc">Racontons votre histoire à travers mes images. Un café, un appel, un message — je suis là pour vous.</p>
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <h3 data-i18n="contact-info-title">Parlons de votre projet</h3>
+        <p data-i18n="contact-info-desc">Que ce soit pour un mariage, un anniversaire ou tout autre événement, je serai ravi d'échanger avec vous autour d'un café pour créer quelque chose d'unique.</p>
+        <div class="contact-detail">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Lyon & Région Auvergne-Rhône-Alpes</span>
+        </div>
+        <div class="contact-detail">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>06 12 34 56 78</span>
+        </div>
+        <div class="contact-detail">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>bonjour@eclats-instants.fr</span>
+        </div>
+      </div>
+      <form class="reveal" aria-label="Formulaire de contact" novalidate>
+        <div class="form-group">
+          <label for="name" data-i18n="form-name">Nom & Prénom</label>
+          <input type="text" id="name" name="name" required data-i18n-placeholder="form-name-placeholder" placeholder="Votre nom">
+        </div>
+        <div class="form-group">
+          <label for="email" data-i18n="form-email">Email</label>
+          <input type="email" id="email" name="email" required data-i18n-placeholder="form-email-placeholder" placeholder="votre@email.com">
+        </div>
+        <div class="form-group">
+          <label for="event" data-i18n="form-event">Type d'événement</label>
+          <input type="text" id="event" name="event" data-i18n-placeholder="form-event-placeholder" placeholder="Mariage, anniversaire...">
+        </div>
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-group">
+            <label for="event-date" data-i18n="form-date">Date de l'événement</label>
+            <input type="date" id="event-date" name="event-date" required>
+          </div>
+          <div class="form-group">
+            <label for="event-country" data-i18n="form-country">Pays</label>
+            <select id="event-country" name="event-country" style="width:100%;padding:14px 16px;background:#F5F1EC;border:none;color:#1A1A1A;font-size:.9rem;border-radius:0;appearance:auto">
+              <option value="France">France</option>
+              <option value="Belgique">Belgique</option>
+              <option value="Suisse">Suisse</option>
+              <option value="Luxembourg">Luxembourg</option>
+              <option value="Allemagne">Allemagne</option>
+              <option value="Italie">Italie</option>
+              <option value="Espagne">Espagne</option>
+              <option value="Portugal">Portugal</option>
+              <option value="Royaume-Uni">Royaume-Uni</option>
+              <option value="Pays-Bas">Pays-Bas</option>
+              <option value="Autriche">Autriche</option>
+              <option value="Monaco">Monaco</option>
+              <option value="Andorre">Andorre</option>
+              <option value="Danemark">Danemark</option>
+              <option value="Suède">Suède</option>
+              <option value="Norvège">Norvège</option>
+              <option value="Irlande">Irlande</option>
+              <option value="République tchèque">République tchèque</option>
+              <option value="Pologne">Pologne</option>
+              <option value="Grèce">Grèce</option>
+              <option value="Croatie">Croatie</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-group">
+            <label for="event-duration" data-i18n="form-duration">Durée souhaitée</label>
+            <select id="event-duration" name="event-duration" style="width:100%;padding:14px 16px;background:#F5F1EC;border:none;color:#1A1A1A;font-size:.9rem;border-radius:0;appearance:auto">
+              <option value="1h">1 heure</option>
+              <option value="2h">2 heures</option>
+              <option value="4h">½ journée (4h)</option>
+              <option value="1j" selected="selected">1 journée</option>
+              <option value="2j">2 jours</option>
+              <option value="3j+">3 jours ou plus</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="message" data-i18n="form-message">Message</label>
+          <textarea id="message" name="message" required data-i18n-placeholder="form-message-placeholder" placeholder="Parlez-moi de votre projet..."></textarea>
+        </div>
+        <button type="submit" class="submit-btn" data-i18n="form-submit">Envoyer la demande</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer role="contentinfo">
+  <div class="container">
+    <div class="footer-social">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+      <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></a>
+      <a href="#" aria-label="Pinterest"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.84 3.44 8.87 8 9.8-.11-.86-.2-2.2.04-3.15.22-.87 1.4-5.93 1.4-5.93s-.36-.73-.36-1.8c0-1.68.98-2.94 2.2-2.94 1.04 0 1.54.78 1.54 1.72 0 1.05-.67 2.62-1.02 4.07-.3 1.22.6 2.22 1.8 2.22 2.16 0 3.82-2.28 3.82-5.57 0-2.91-2.09-4.95-5.08-4.95-3.46 0-5.49 2.6-5.49 5.28 0 1.05.4 2.18.9 2.79.1.12.12.23.09.35-.09.38-.3 1.2-.34 1.37-.05.22-.18.27-.41.16-1.53-.71-2.48-2.95-2.48-4.74 0-3.86 2.8-7.4 8.08-7.4 4.24 0 7.54 3.02 7.54 7.07 0 4.22-2.66 7.61-6.36 7.61-1.24 0-2.41-.64-2.81-1.4l-.76 2.9c-.28 1.06-1.02 2.38-1.52 3.19C9.45 21.82 10.7 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg></a>
+    </div>
+    <div class="logo">Éclats d'Instants</div>
+    <p data-i18n="footer-copyright">&copy; 2025 — Photographie & Vidéo. Tous droits réservés.</p>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" role="dialog" aria-modal="true" aria-label="Aperçu agrandi">
+  <button class="lightbox-close" aria-label="Fermer">&times;</button>
+  <button class="lightbox-btn lightbox-prev" aria-label="Précédent">&lsaquo;</button>
+  <button class="lightbox-btn lightbox-next" aria-label="Suivant">&rsaquo;</button>
+  <img src="" alt="">
+  <p class="lightbox-counter"></p>
+</div>
+
+<!-- FLOATING CTA -->
+<a href="#contact" class="float-cta" aria-label="Contact">
+  <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+</a>
+
+<script>
+(function() {
+  'use strict';
+
+  // ==============================
+  // DATA
+  // ==============================
+  var STORAGE_KEY = 'ec_data';
+
+  var DEFAULT_DATA = {
+    gallery: [
+      { id: 'w1', url: 'https://picsum.photos/seed/w1/800/1000', category: 'mariage', alt: 'Mariage — Cérémonie en extérieur', tall: true },
+      { id: 'w2', url: 'https://picsum.photos/seed/w2/600/600', category: 'mariage', alt: 'Mariage — Photo de couple' },
+      { id: 'b1', url: 'https://picsum.photos/seed/b1/600/600', category: 'anniversaire', alt: 'Anniversaire — Photo de groupe' },
+      { id: 'p1', url: 'https://picsum.photos/seed/p1/600/600', category: 'portrait', alt: 'Portrait professionnel' },
+      { id: 'b2', url: 'https://picsum.photos/seed/b2/1200/600', category: 'anniversaire', alt: 'Anniversaire — Décoration', wide: true },
+      { id: 'p2', url: 'https://picsum.photos/seed/p2/600/600', category: 'portrait', alt: 'Portrait en extérieur' },
+      { id: 'w3', url: 'https://picsum.photos/seed/w3/800/1000', category: 'mariage', alt: 'Mariage — Réception', tall: true },
+      { id: 'b3', url: 'https://picsum.photos/seed/b3/600/600', category: 'anniversaire', alt: 'Anniversaire — Gâteau' },
+      { id: 'p3', url: 'https://picsum.photos/seed/p3/600/600', category: 'portrait', alt: 'Portrait studio' }
+    ],
+    videos: [
+      { id: 'v1', url: 'https://picsum.photos/seed/v1/640/360', label: 'Mariage — Clara & Marc', alt: 'Vidéo — Mariage de Clara & Marc' },
+      { id: 'v2', url: 'https://picsum.photos/seed/v2/640/360', label: 'Anniversaire — Sophie & Philippe', alt: 'Vidéo — Anniversaire de Sophie & Philippe' },
+      { id: 'v3', url: 'https://picsum.photos/seed/v3/640/360', label: 'Highlight — Été 2025', alt: 'Vidéo — Highlight été 2025' }
+    ],
+    testimonials: [
+      { id: 't1', name: 'Clara & Marc', event: 'Mariage, Juin 2025', avatar: 'https://picsum.photos/seed/av1/100/100', stars: 5, text: 'Un travail absolument magnifique. Thomas a su capturer chaque émotion de notre mariage avec une sensibilité incroyable. Les photos sont plus belles que tout ce qu\'on aurait pu imaginer.' },
+      { id: 't2', name: 'Sophie & Philippe', event: 'Anniversaire, Mars 2025', avatar: 'https://picsum.photos/seed/av2/100/100', stars: 5, text: 'Nous avons fait appel à Éclats d\'Instants pour l\'anniversaire de nos 20 ans de mariage. Une équipe professionnelle, discrète et très talentueuse. Les vidéos sont pleines d\'émotion.' },
+      { id: 't3', name: 'Julie', event: 'Portrait, Février 2025', avatar: 'https://picsum.photos/seed/av3/100/100', stars: 5, text: 'Un vrai talent pour mettre les gens à l\'aise. La séance portrait était un pur moment de plaisir, et les résultats sont époustouflants. Je recommande les yeux fermés.' }
+    ],
+    bookings: []
+  };
+
+  function ensureDataShape(d) {
+    if (!d || typeof d !== 'object') return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    if (!Array.isArray(d.gallery) && !Array.isArray(d.videos) && !Array.isArray(d.testimonials) && !Array.isArray(d.bookings)) return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    if (!Array.isArray(d.gallery)) d.gallery = [];
+    if (!Array.isArray(d.videos)) d.videos = [];
+    if (!Array.isArray(d.testimonials)) d.testimonials = [];
+    if (!Array.isArray(d.bookings)) d.bookings = [];
+    return d;
+  }
+
+  function loadData() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') return ensureDataShape(parsed);
+      }
+    } catch(e) {}
+    return JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+
+  var data = loadData();
+  // Auto-repair localStorage if data was corrupted
+  try {
+    var rawCheck = localStorage.getItem(STORAGE_KEY);
+    if (!rawCheck || JSON.stringify(ensureDataShape(JSON.parse(rawCheck))) !== rawCheck) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+  } catch(e) {}
+
+  // ==============================
+  // I18N
+  // ==============================
+  var i18n = {
+    fr: {
+      'site-title': 'Éclats d\'Instants — Photographie de mariages & événements',
+      'skip-link': 'Aller au contenu',
+      'nav-gallery': 'Galerie', 'nav-pricing': 'Prestations', 'nav-testimonials': 'Témoignages',
+      'nav-videos': 'Vidéos', 'nav-contact': 'Contact', 'nav-cta': 'Devis gratuit',
+      'hero-badge': 'Photographe de mariages & événements',
+      'hero-desc': 'Des souvenirs authentiques, capturés avec émotion — pour que chaque regard, chaque sourire, chaque instant reste gravé.',
+      'hero-btn': 'Voir mon travail', 'hero-btn-alt': 'Me contacter', 'scroll': 'Scroll',
+      'about-label': 'À propos', 'about-title': 'Derrière l\'objectif',
+      'about-p1': 'Passionné par l\'art de capturer les émotions brutes, je parcours la région Auvergne-Rhône-Alpes pour immortaliser vos plus beaux moments. Mariages, anniversaires, portraits — chaque séance est une histoire à raconter.',
+      'about-p2': 'Mon approche est discrète mais attentive. Je ne cherche pas à mettre en scène, mais à saisir l\'authenticité de chaque instant. La lumière naturelle, les sourires complices, les regards échangés — voilà ce qui donne vie à mes images.',
+      'gallery-label': 'Portfolio', 'gallery-title': 'Galerie',
+      'filter-all': 'Tous', 'filter-wedding': 'Mariages', 'filter-birthday': 'Anniversaires', 'filter-portrait': 'Portraits',
+      'cat-wedding': 'Mariage', 'cat-birthday': 'Anniversaire', 'cat-portrait': 'Portrait',
+      'stat-1': 'Mariages capturés', 'stat-2': 'Événements immortalisés', 'stat-3': 'Années d\'expérience', 'stat-4': 'Clients satisfaits',
+      'pricing-label': 'Forfaits', 'pricing-title': 'Prestations',
+      'pricing-desc': 'Des formules pensées pour chaque projet, avec la même exigence de qualité.',
+      'plan-essential': 'Essentiel', 'plan-essential-sub': 'Petits événements',
+      'plan-essential-1': '2h de couverture photo', 'plan-essential-2': '50 photos retouchées',
+      'plan-essential-3': 'Galerie privée en ligne', 'plan-essential-4': 'Livraison sous 7 jours',
+      'plan-badge': 'Recommandé',
+      'plan-premium-sub': 'Mariages & grands événements',
+      'plan-premium-1': '6h de couverture photo & vidéo', 'plan-premium-2': '200+ photos retouchées',
+      'plan-premium-3': 'Vidéo highlight 3 min', 'plan-premium-4': 'Galerie privée en ligne',
+      'plan-premium-5': 'Album photo 30 pages', 'plan-premium-6': 'Livraison sous 14 jours',
+      'plan-book': 'Réserver',
+      'plan-custom': 'Sur Mesure', 'plan-custom-price': 'Sur devis', 'plan-custom-sub': 'Événements sur plusieurs jours',
+      'plan-custom-1': 'Couverture complète', 'plan-custom-2': 'Photos en nombre illimité',
+      'plan-custom-3': 'Vidéo longue durée', 'plan-custom-4': 'Album premium 50 pages',
+      'plan-custom-5': 'Drone / vidéo aérienne', 'plan-custom-6': 'Livraison prioritaire',
+      'plan-contact': 'Me contacter',
+      'testimonials-label': 'Ils m\'ont fait confiance', 'testimonials-title': 'Témoignages',
+      'testimonial-1': '', 'testimonial-1-event': '', 'testimonial-2': '', 'testimonial-2-event': '', 'testimonial-3': '', 'testimonial-3-event': '',
+      'videos-label': 'Motion', 'videos-title': 'Vidéos',
+      'video-1': '', 'video-1-label': '', 'video-2': '', 'video-2-label': '', 'video-3': '', 'video-3-label': '',
+      'contact-label': 'Contact', 'contact-title': 'Travaillons ensemble',
+      'contact-desc': 'Racontons votre histoire à travers mes images. Un café, un appel, un message — je suis là pour vous.',
+      'contact-info-title': 'Parlons de votre projet',
+      'contact-info-desc': 'Que ce soit pour un mariage, un anniversaire ou tout autre événement, je serai ravi d\'échanger avec vous autour d\'un café pour créer quelque chose d\'unique.',
+      'form-name': 'Nom & Prénom', 'form-name-placeholder': 'Votre nom',
+      'form-email': 'Email', 'form-email-placeholder': 'votre@email.com',
+      'form-event': 'Type d\'événement', 'form-event-placeholder': 'Mariage, anniversaire...',
+      'form-date': 'Date de l\'événement',
+      'form-country': 'Pays',
+      'form-duration': 'Durée souhaitée',
+      'form-message': 'Message', 'form-message-placeholder': 'Parlez-moi de votre projet...',
+      'form-submit': 'Envoyer la demande',
+      'form-booking-conflict': 'Cette date est déjà réservée. Contactez-moi directement pour discuter des disponibilités.',
+      'alert-fill': 'Veuillez remplir tous les champs obligatoires.',
+      'alert-email': 'Veuillez entrer une adresse email valide.',
+      'alert-thanks': 'Merci pour votre demande ! Je vous recontacterai rapidement pour confirmer la disponibilité.',
+      'footer-copyright': '© 2025 — Photographie & Vidéo. Tous droits réservés.',
+      'alert-fill': 'Veuillez remplir tous les champs obligatoires.',
+      'alert-email': 'Veuillez entrer une adresse email valide.',
+      'alert-thanks': 'Merci pour votre message ! Je vous répondrai dans les plus brefs délais.',
+      'alert-video': 'Vidéo démo — à intégrer avec Vimeo ou YouTube.',
+    },
+    en: {
+      'site-title': 'Éclats d\'Instants — Wedding & Event Photography',
+      'skip-link': 'Skip to content',
+      'nav-gallery': 'Gallery', 'nav-pricing': 'Pricing', 'nav-testimonials': 'Testimonials',
+      'nav-videos': 'Videos', 'nav-contact': 'Contact', 'nav-cta': 'Free quote',
+      'hero-badge': 'Wedding & Event Photographer',
+      'hero-desc': 'Authentic memories, captured with emotion — so every glance, every smile, every moment stays etched forever.',
+      'hero-btn': 'View my work', 'hero-btn-alt': 'Contact me', 'scroll': 'Scroll',
+      'about-label': 'About', 'about-title': 'Behind the lens',
+      'about-p1': 'Passionate about capturing raw emotions, I travel across the Auvergne-Rhône-Alpes region to immortalize your most beautiful moments. Weddings, birthdays, portraits — each session is a story to tell.',
+      'about-p2': 'My approach is discreet yet attentive. I don\'t try to stage things, but to capture the authenticity of each moment. Natural light, knowing smiles, exchanged glances — that\'s what brings my images to life.',
+      'gallery-label': 'Portfolio', 'gallery-title': 'Gallery',
+      'filter-all': 'All', 'filter-wedding': 'Weddings', 'filter-birthday': 'Birthdays', 'filter-portrait': 'Portraits',
+      'cat-wedding': 'Wedding', 'cat-birthday': 'Birthday', 'cat-portrait': 'Portrait',
+      'stat-1': 'Weddings captured', 'stat-2': 'Events immortalized', 'stat-3': 'Years of experience', 'stat-4': 'Happy clients',
+      'pricing-label': 'Packages', 'pricing-title': 'Pricing',
+      'pricing-desc': 'Packages designed for every project, with the same commitment to quality.',
+      'plan-essential': 'Essential', 'plan-essential-sub': 'Small events',
+      'plan-essential-1': '2h photo coverage', 'plan-essential-2': '50 retouched photos',
+      'plan-essential-3': 'Private online gallery', 'plan-essential-4': 'Delivery within 7 days',
+      'plan-badge': 'Recommended',
+      'plan-premium-sub': 'Weddings & large events',
+      'plan-premium-1': '6h photo & video coverage', 'plan-premium-2': '200+ retouched photos',
+      'plan-premium-3': '3-min highlight video', 'plan-premium-4': 'Private online gallery',
+      'plan-premium-5': '30-page photo album', 'plan-premium-6': 'Delivery within 14 days',
+      'plan-book': 'Book now',
+      'plan-custom': 'Custom', 'plan-custom-price': 'Custom quote', 'plan-custom-sub': 'Multi-day events',
+      'plan-custom-1': 'Full coverage', 'plan-custom-2': 'Unlimited photos',
+      'plan-custom-3': 'Full-length video', 'plan-custom-4': '50-page premium album',
+      'plan-custom-5': 'Drone / aerial video', 'plan-custom-6': 'Priority delivery',
+      'plan-contact': 'Contact me',
+      'testimonials-label': 'They trusted me', 'testimonials-title': 'Testimonials',
+      'testimonial-1': '', 'testimonial-1-event': '', 'testimonial-2': '', 'testimonial-2-event': '', 'testimonial-3': '', 'testimonial-3-event': '',
+      'videos-label': 'Motion', 'videos-title': 'Videos',
+      'video-1': '', 'video-1-label': '', 'video-2': '', 'video-2-label': '', 'video-3': '', 'video-3-label': '',
+      'contact-label': 'Contact', 'contact-title': 'Let\'s work together',
+      'contact-desc': 'Let\'s tell your story through my images. A coffee, a call, a message — I\'m here for you.',
+      'contact-info-title': 'Let\'s talk about your project',
+      'contact-info-desc': 'Whether it\'s a wedding, a birthday or any other event, I\'d love to chat over a coffee and create something unique together.',
+      'form-name': 'Full Name', 'form-name-placeholder': 'Your name',
+      'form-email': 'Email', 'form-email-placeholder': 'your@email.com',
+      'form-event': 'Event Type', 'form-event-placeholder': 'Wedding, birthday...',
+      'form-date': 'Event date',
+      'form-country': 'Country',
+      'form-duration': 'Desired duration',
+      'form-message': 'Message', 'form-message-placeholder': 'Tell me about your project...',
+      'form-submit': 'Send request',
+      'form-booking-conflict': 'This date is already booked. Please contact me directly to discuss availability.',
+      'alert-fill': 'Please fill in all required fields.',
+      'alert-email': 'Please enter a valid email address.',
+      'alert-thanks': 'Thank you for your request! I\'ll get back to you shortly to confirm availability.',
+      'alert-video': 'Demo video — to integrate with Vimeo or YouTube.',
+    }
+  };
+
+  var currentLang = localStorage.getItem('ec_lang') || 'fr';
+
+  function applyLanguage(lang) {
+    currentLang = lang;
+    var tr = i18n[lang];
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      if (tr[key]) el.textContent = tr[key];
+    });
+    document.querySelectorAll('[data-i18n-alt]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n-alt');
+      if (tr[key]) el.setAttribute('alt', tr[key]);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n-placeholder');
+      if (tr[key]) el.setAttribute('placeholder', tr[key]);
+    });
+    document.title = tr['site-title'];
+    document.documentElement.setAttribute('lang', lang);
+    document.querySelector('nav').setAttribute('aria-label', lang === 'fr' ? 'Navigation principale' : 'Main navigation');
+    document.querySelector('#gallery').setAttribute('aria-label', lang === 'fr' ? 'Galerie photo' : 'Photo gallery');
+    document.querySelector('#pricing').setAttribute('aria-label', lang === 'fr' ? 'Prestations et tarifs' : 'Services and pricing');
+    document.querySelector('#testimonials').setAttribute('aria-label', lang === 'fr' ? 'Témoignages clients' : 'Client testimonials');
+    document.querySelector('#contact').setAttribute('aria-label', lang === 'fr' ? 'Contact' : 'Contact');
+    document.querySelector('#about').setAttribute('aria-label', lang === 'fr' ? 'À propos' : 'About');
+    document.querySelector('.filter-bar').setAttribute('aria-label', lang === 'fr' ? 'Filtrer par catégorie' : 'Filter by category');
+    document.querySelector('form').setAttribute('aria-label', lang === 'fr' ? 'Formulaire de contact' : 'Contact form');
+    document.querySelector('.lightbox').setAttribute('aria-label', lang === 'fr' ? 'Aperçu agrandi' : 'Enlarged view');
+    document.querySelector('.lightbox-close').setAttribute('aria-label', lang === 'fr' ? 'Fermer' : 'Close');
+    document.querySelector('.lightbox-prev').setAttribute('aria-label', lang === 'fr' ? 'Précédent' : 'Previous');
+    document.querySelector('.lightbox-next').setAttribute('aria-label', lang === 'fr' ? 'Suivant' : 'Next');
+    document.querySelectorAll('.lang-btn').forEach(function(b) {
+      b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+    });
+    localStorage.setItem('ec_lang', lang);
+  }
+
+  applyLanguage(currentLang);
+
+  document.querySelectorAll('.lang-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var lang = this.getAttribute('data-lang');
+      if (lang !== currentLang) applyLanguage(lang);
+    });
+  });
+
+  // ==============================
+  // RENDER GALLERY
+  // ==============================
+  var categoryLabels = { mariage: 'cat-wedding', anniversaire: 'cat-birthday', portrait: 'cat-portrait' };
+
+  function renderGallery() {
+    var grid = document.getElementById('gallery-grid');
+    grid.innerHTML = '';
+    if (!data.gallery || !data.gallery.length) return;
+    data.gallery.forEach(function(item) {
+      var div = document.createElement('div');
+      div.className = 'grid-item aperture-visible' + (item.tall ? ' tall' : '') + (item.wide ? ' wide' : '');
+      div.setAttribute('role', 'listitem');
+      div.setAttribute('data-category', item.category);
+      div.innerHTML =
+        '<img src="' + item.url + '" alt="" data-i18n-alt="' + item.alt + '" loading="lazy">' +
+        '<div class="overlay"><span data-i18n="' + categoryLabels[item.category] + '">' + item.category + '</span></div>';
+      grid.appendChild(div);
+    });
+    // re-apply i18n for overlay text
+    var tr = i18n[currentLang];
+    grid.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      if (tr[key]) el.textContent = tr[key];
+    });
+    // re-apply alt texts
+    grid.querySelectorAll('[data-i18n-alt]').forEach(function(el) {
+      el.setAttribute('alt', el.getAttribute('data-i18n-alt'));
+    });
+    // re-bind lightbox
+    bindLightbox();
+    // re-bind filter
+    bindFilter();
+  }
+
+  // ==============================
+  // APERTURE REVEAL
+  // ==============================
+  var apertureObserved = false;
+  function observeAperture() {
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('aperture-visible');
+            observer.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
+      document.querySelectorAll('.grid-item').forEach(function(el, i) {
+        if (el.classList.contains('aperture-visible')) return;
+        el.style.transitionDelay = (i * 0.06) + 's';
+        observer.observe(el);
+      });
+    } else {
+      document.querySelectorAll('.grid-item').forEach(function(el) {
+        el.classList.add('aperture-visible');
+      });
+    }
+  }
+
+  // ==============================
+  // RENDER VIDEOS
+  // ==============================
+  function renderVideos() {
+    var grid = document.getElementById('video-grid');
+    grid.innerHTML = '';
+    if (!data.videos || !data.videos.length) {
+      grid.innerHTML = '<div class="reveal visible" style="grid-column:1/-1;text-align:center;padding:40px;color:#8C8C8C;">Aucune vidéo pour le moment.</div>';
+      return;
+    }
+    data.videos.forEach(function(item, idx) {
+      var delay = 'reveal-d' + ((idx % 3) + 1);
+      var div = document.createElement('div');
+      div.className = 'video-card reveal ' + delay;
+      div.innerHTML =
+        '<img src="' + item.url + '" alt="" data-i18n-alt="' + item.alt + '" loading="lazy">' +
+        '<div class="video-play"><svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg></div>' +
+        '<span class="label">' + item.label + '</span>';
+      div.addEventListener('click', function() {
+        alert(i18n[currentLang]['alert-video']);
+      });
+      grid.appendChild(div);
+      requestAnimationFrame(function() { div.classList.add('visible'); });
+    });
+  }
+
+  // ==============================
+  // RENDER TESTIMONIALS
+  // ==============================
+  function renderTestimonials() {
+    var grid = document.getElementById('testimonials-grid');
+    grid.innerHTML = '';
+    if (!data.testimonials || !data.testimonials.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#8C8C8C;">Aucun témoignage pour le moment.</div>';
+      return;
+    }
+    data.testimonials.forEach(function(item, idx) {
+      var delay = 'reveal-d' + ((idx % 3) + 1);
+      var stars = '';
+      for (var s = 0; s < (item.stars || 5); s++) stars += '\u2605';
+      var div = document.createElement('div');
+      div.className = 'testimonial-card reveal ' + delay;
+      div.innerHTML =
+        '<div class="stars">' + stars + '</div>' +
+        '<blockquote>' + item.text + '</blockquote>' +
+        '<div class="testimonial-author">' +
+          '<img src="' + item.avatar + '" alt="" loading="lazy">' +
+          '<div><strong>' + item.name + '</strong><span>' + item.event + '</span></div>' +
+        '</div>';
+      grid.appendChild(div);
+      requestAnimationFrame(function() { div.classList.add('visible'); });
+    });
+  }
+
+  // ==============================
+  // LIGHTBOX
+  // ==============================
+  var lightboxItems = [];
+  var currentIdx = 0;
+
+  function bindLightbox() {
+    var items = document.querySelectorAll('.grid-item');
+    lightboxItems = [];
+    items.forEach(function(item) {
+      item.addEventListener('click', function() {
+        var visible = getVisibleItems();
+        var idx = visible.indexOf(this);
+        if (idx >= 0) openLightbox(idx);
+      });
+    });
+  }
+
+  function getVisibleItems() {
+    var result = [];
+    document.querySelectorAll('.grid-item').forEach(function(itm) {
+      if (itm.style.display !== 'none') result.push(itm);
+    });
+    return result;
+  }
+
+  function openLightbox(index) {
+    var visible = getVisibleItems();
+    if (!visible.length) return;
+    currentIdx = Math.max(0, Math.min(index, visible.length - 1));
+    var item = visible[currentIdx];
+    var img = item.querySelector('img');
+    if (!img) return;
+    document.querySelector('.lightbox img').src = img.src;
+    document.querySelector('.lightbox-counter').textContent = (currentIdx + 1) + ' / ' + visible.length;
+    document.querySelector('.lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLb() {
+    document.querySelector('.lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function navigateLb(dir) {
+    var visible = getVisibleItems();
+    if (!visible.length) return;
+    currentIdx = (currentIdx + dir + visible.length) % visible.length;
+    var img = visible[currentIdx].querySelector('img');
+    if (!img) return;
+    document.querySelector('.lightbox img').src = img.src;
+    document.querySelector('.lightbox-counter').textContent = (currentIdx + 1) + ' / ' + visible.length;
+  }
+
+  document.querySelector('.lightbox-close').addEventListener('click', closeLb);
+  document.querySelector('.lightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLb();
+  });
+  document.querySelector('.lightbox-prev').addEventListener('click', function() { navigateLb(-1); });
+  document.querySelector('.lightbox-next').addEventListener('click', function() { navigateLb(1); });
+  document.addEventListener('keydown', function(e) {
+    if (!document.querySelector('.lightbox').classList.contains('open')) return;
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowLeft') navigateLb(-1);
+    if (e.key === 'ArrowRight') navigateLb(1);
+  });
+
+  // ==============================
+  // FILTER
+  // ==============================
+  function bindFilter() {
+    var filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        filterBtns.forEach(function(b) {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        var filter = btn.getAttribute('data-filter');
+        document.querySelectorAll('.grid-item').forEach(function(item) {
+          item.style.display = (filter === 'all' || item.getAttribute('data-category') === filter) ? '' : 'none';
+        });
+        // observe newly visible items for aperture
+        observeAperture();
+      });
+    });
+  }
+
+  // ==============================
+  // NAV ENTRANCE + SCROLL
+  // ==============================
+  window.addEventListener('load', function() {
+    document.querySelector('nav').classList.add('nav-visible');
+  });
+  window.addEventListener('scroll', function() {
+    document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
+
+  // ==============================
+  // MOBILE MENU
+  // ==============================
+  var toggle = document.querySelector('.nav-toggle');
+  var mobileMenu = document.querySelector('.mobile-menu');
+  toggle.addEventListener('click', function() {
+    var open = mobileMenu.classList.toggle('open');
+    toggle.classList.toggle('active');
+    toggle.setAttribute('aria-expanded', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+  mobileMenu.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      mobileMenu.classList.remove('open');
+      toggle.classList.remove('active');
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    });
+  });
+
+  // ==============================
+  // HERO SLIDESHOW
+  // ==============================
+  (function() {
+    var slides = document.querySelectorAll('.hero-slides img');
+    if (slides.length < 2) return;
+    var idx = 0;
+    slides[idx].classList.add('ken-burns');
+    setInterval(function() {
+      slides[idx].classList.remove('active');
+      slides[idx].classList.remove('ken-burns');
+      idx = (idx + 1) % slides.length;
+      slides[idx].classList.add('active');
+      // force reflow then add ken-burns so the animation restarts
+      void slides[idx].offsetWidth;
+      slides[idx].classList.add('ken-burns');
+    }, 5000);
+  })();
+
+  // ==============================
+  // COUNTER ANIMATION
+  // ==============================
+  (function() {
+    var counted = false;
+    var statNums = document.querySelectorAll('.stat-num');
+    if (!statNums.length) return;
+    function animate() {
+      if (counted) return;
+      counted = true;
+      statNums.forEach(function(el) {
+        var target = parseInt(el.getAttribute('data-count'), 10);
+        if (isNaN(target)) return;
+        var current = 0;
+        var step = Math.max(1, Math.floor(target / 40));
+        var interval = setInterval(function() {
+          current += step;
+          if (current >= target) {
+            el.textContent = target + (target >= 100 ? '+' : '');
+            clearInterval(interval);
+          } else {
+            el.textContent = current;
+          }
+        }, 30);
+      });
+    }
+    if ('IntersectionObserver' in window) {
+      var obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) { animate(); obs.unobserve(e.target); }
+        });
+      }, { threshold: 0.4 });
+      obs.observe(document.querySelector('.stats-grid'));
+    } else { animate(); }
+  })();
+
+  // ==============================
+  // SCROLL REVEAL
+  // ==============================
+  if ('IntersectionObserver' in window) {
+    document.querySelectorAll('.reveal').forEach(function(el) {
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            observer.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+      observer.observe(el);
+    });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('visible'); });
+  }
+
+  // ==============================
+  // FLOATING CTA
+  // ==============================
+  var floatCta = document.querySelector('.float-cta');
+  window.addEventListener('scroll', function() {
+    var hero = document.querySelector('.hero');
+    floatCta.classList.toggle('visible', window.scrollY > (hero.offsetTop + hero.offsetHeight - 200));
+  }, { passive: true });
+
+  // ==============================
+  // FORM
+  // ==============================
+  document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var tr = i18n[currentLang];
+    var name = document.getElementById('name').value.trim();
+    var email = document.getElementById('email').value.trim();
+    var eventType = document.getElementById('event').value.trim();
+    var eventDate = document.getElementById('event-date').value;
+    var eventCountry = document.getElementById('event-country').value;
+    var eventDuration = document.getElementById('event-duration').value;
+    var message = document.getElementById('message').value.trim();
+    if (!name || !email || !eventDate || !message) { alert(tr['alert-fill']); return; }
+    if (!email.includes('@') || !email.includes('.')) { alert(tr['alert-email']); return; }
+
+    try {
+      var raw = localStorage.getItem('ec_data');
+      var data = raw ? JSON.parse(raw) : { bookings: [] };
+    } catch(e) { data = { bookings: [] }; }
+    if (!data.bookings) data.bookings = [];
+    var conflict = data.bookings.some(function(b) { return b.eventDate === eventDate && b.status !== 'cancelled'; });
+    if (conflict) { alert(tr['form-booking-conflict']); return; }
+
+    data.bookings.push({
+      id: 'b' + Date.now(),
+      clientName: name,
+      email: email,
+      eventType: eventType || 'Non spécifié',
+      eventDate: eventDate,
+      country: eventCountry,
+      duration: eventDuration,
+      message: message,
+      status: 'pending',
+      createdAt: new Date().toISOString().split('T')[0]
+    });
+    localStorage.setItem('ec_data', JSON.stringify(data));
+
+    alert(tr['alert-thanks']);
+    this.reset();
+  });
+
+  // ==============================
+  // INIT
+  // ==============================
+  renderGallery();
+  renderVideos();
+  renderTestimonials();
+
+  var dateInput = document.getElementById('event-date');
+  if (dateInput) {
+    var today = new Date();
+    dateInput.min = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+  }
+
+})();
+</script>
+</body>
+</html>

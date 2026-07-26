@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Éclats d'Instants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #F3F0EB;
+  color: #1A1A1A;
+  font-size: 0.9rem;
+  -webkit-font-smoothing: antialiased;
+}
+input, textarea, select, button { font: inherit; }
+a { text-decoration: none; color: inherit; }
+:focus-visible { outline: 2px solid #C4A06A; outline-offset: 2px; }
+
+/* === LOGIN OVERLAY === */
+#login-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  background: #1A1A1A;
+}
+#login-overlay.hidden { display: none; }
+.login-box {
+  background: #F3F0EB; padding: 48px 40px; border-radius: 16px;
+  width: 360px; max-width: 92vw;
+}
+.login-box h1 {
+  font-family: 'Playfair Display', serif; font-weight: 500;
+  font-size: 1.5rem; margin-bottom: 4px; color: #1A1A1A;
+}
+.login-box p { font-size: 0.85rem; color: #8C8C8C; margin-bottom: 24px; }
+.login-box .form-group { margin-bottom: 16px; }
+.login-box label { display: block; font-size: 0.8rem; font-weight: 500; margin-bottom: 4px; color: #1A1A1A; }
+.login-box input {
+  width: 100%; padding: 10px 14px; border: 1px solid #D4CEC4; border-radius: 8px;
+  background: #fff; font-size: 0.9rem;
+}
+.login-box input:focus { border-color: #C4A06A; outline: none; box-shadow: 0 0 0 3px rgba(196,160,106,0.2); }
+.login-box .btn { width: 100%; padding: 12px; margin-top: 8px; }
+.login-error { color: #D94A4A; font-size: 0.8rem; margin-top: 8px; text-align: center; display: none; }
+.login-error.show { display: block; }
+
+/* === LAYOUT === */
+.app { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 240px;
+  background: #1A1A1A;
+  color: #fff;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.sidebar h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.sidebar .sub {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+}
+.sidebar nav { display: flex; flex-direction: column; gap: 4px; }
+.sidebar nav a {
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidebar nav a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+.sidebar nav a.active { color: #fff; background: rgba(255,255,255,0.08); }
+.sidebar nav a svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.5; flex-shrink: 0; }
+.sidebar .back {
+  margin-top: auto;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s;
+}
+.sidebar .back:hover { color: rgba(255,255,255,0.7); }
+.sidebar .back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+.main {
+  flex: 1;
+  padding: 40px;
+  max-width: calc(100vw - 240px);
+}
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.main-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+}
+.main-header .count {
+  font-size: 0.85rem;
+  color: #8C8C8C;
+  margin-top: 4px;
+}
+.section-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 24px;
+}
+.section-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* === FORM === */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.form-row.three { grid-template-columns: 1fr 1fr auto; }
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4A4A4A;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #E5DDD1;
+  background: #fff;
+  font-size: 0.88rem;
+  transition: border-color 0.2s;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #C4A06A;
+  box-shadow: 0 0 0 3px rgba(196,160,106,0.1);
+}
+.form-group textarea { resize: vertical; min-height: 80px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-primary { background: #1A1A1A; color: #fff; }
+.btn-primary:hover { background: #333; }
+.btn-accent { background: #C4A06A; color: #fff; }
+.btn-accent:hover { background: #B38D55; }
+.btn-outline { background: transparent; color: #4A4A4A; border: 1px solid #E5DDD1; }
+.btn-outline:hover { border-color: #1A1A1A; color: #1A1A1A; }
+.btn-danger { background: transparent; color: #DC2626; border: 1px solid #FECACA; }
+.btn-danger:hover { background: #FEF2F2; }
+.btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+.btn-icon { padding: 6px 10px; }
+
+/* === GALLERY GRID === */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.gallery-card {
+  position: relative;
+  background: #F8F6F3;
+  border: 1px solid #EFE9E0;
+  overflow: hidden;
+}
+.gallery-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+.gallery-card .info {
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.gallery-card .info .cat {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #C4A06A;
+  font-weight: 600;
+}
+.gallery-card .actions {
+  position: absolute;
+  top: 8px; right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.gallery-card:hover .actions { opacity: 1; }
+.gallery-card .actions button {
+  width: 32px; height: 32px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.gallery-card .actions .del { background: rgba(220,38,38,0.9); color: #fff; }
+.gallery-card .actions .del:hover { background: #DC2626; }
+.gallery-card .actions .move { background: rgba(0,0,0,0.6); color: #fff; }
+.gallery-card .actions .move:hover { background: rgba(0,0,0,0.8); }
+.gallery-card .actions svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+.empty-state {
+  text-align: center;
+  padding: 64px 24px;
+  color: #8C8C8C;
+}
+.empty-state svg { width: 48px; height: 48px; stroke: #D4CFC6; stroke-width: 1; fill: none; margin-bottom: 16px; }
+.empty-state p { font-size: 0.9rem; }
+
+/* === NOTIFICATION === */
+.toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  padding: 14px 24px;
+  background: #1A1A1A;
+  color: #fff;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.3s;
+  z-index: 9999;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: #059669; }
+.toast.error { background: #DC2626; }
+
+/* === VIDEOS === */
+.video-card {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #EFE9E0;
+  margin-bottom: 12px;
+}
+.video-card img { width: 120px; height: 68px; object-fit: cover; flex-shrink: 0; }
+.video-card .info { flex: 1; }
+.video-card .info strong { display: block; font-size: 0.85rem; }
+.video-card .info span { font-size: 0.78rem; color: #8C8C8C; }
+
+/* === ABOUT EDITOR === */
+.about-preview { white-space: pre-line; color: #6B6B6B; font-size: 0.85rem; line-height: 1.7; }
+
+/* === TAB SYSTEM === */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* === STATUS === */
+.status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.status-dot.active { background: #10B981; }
+.status-dot.empty { background: #D4CFC6; }
+
+/* === SETTINGS SECTION === */
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #F0EDE8;
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-row .label { font-weight: 500; }
+.setting-row .desc { font-size: 0.78rem; color: #8C8C8C; margin-top: 2px; }
+.toggle {
+  position: relative;
+  width: 44px; height: 24px;
+  background: #D4CFC6;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle.on { background: #C4A06A; }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 20px; height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.toggle.on::after { transform: translateX(20px); }
+
+/* === IMPORT/EXPORT === */
+.import-export { display: flex; gap: 12px; margin-top: 16px; }
+
+/* === CALENDAR === */
+.calendar-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+.calendar-nav h3 { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:500; }
+.calendar-nav .nav-btns { display:flex; gap:8px; }
+.calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:#EFE9E0; }
+.calendar-grid .day-header { padding:10px; text-align:center; font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:#8C8C8C; background:#F8F6F3; }
+.calendar-grid .day { min-height:100px; padding:8px; background:#fff; position:relative; cursor:pointer; transition:background 0.15s; }
+.calendar-grid .day:hover { background:#FCFAF7; }
+.calendar-grid .day .num { font-size:0.85rem; font-weight:500; color:#4A4A4A; }
+.calendar-grid .day.other-month .num { color:#D4CFC6; }
+.calendar-grid .day.today .num { background:#C4A06A; color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.calendar-grid .day .events { margin-top:6px; display:flex; flex-direction:column; gap:2px; }
+.calendar-grid .day .event { font-size:0.6rem; padding:2px 6px; border-radius:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; transition:opacity 0.15s; }
+.calendar-grid .day .event:hover { opacity:0.8; }
+.calendar-grid .day .event.pending { background:#FEF3C7; color:#92400E; }
+.calendar-grid .day .event.confirmed { background:#D1FAE5; color:#065F46; }
+.calendar-grid .day .event.cancelled { background:#FEE2E2; color:#991B1B; text-decoration:line-through; }
+.calendar-legend { display:flex; gap:20px; margin-top:16px; font-size:0.78rem; color:#6B6B6B; }
+.calendar-legend span { display:flex; align-items:center; gap:6px; }
+.calendar-legend .dot { width:10px; height:10px; border-radius:3px; display:inline-block; }
+.calendar-legend .dot.pending { background:#FEF3C7; }
+.calendar-legend .dot.confirmed { background:#D1FAE5; }
+.calendar-legend .dot.cancelled { background:#FEE2E2; }
+.calendar-detail { margin-top:24px; }
+.calendar-detail h4 { font-size:0.9rem; font-weight:600; margin-bottom:12px; }
+.booking-card { display:flex; align-items:center; gap:16px; padding:16px; border:1px solid #EFE9E0; margin-bottom:8px; background:#fff; }
+.booking-card .info { flex:1; }
+.booking-card .info strong { display:block; font-size:0.85rem; }
+.booking-card .info span { font-size:0.78rem; color:#8C8C8C; }
+.booking-card .badge { font-size:0.65rem; font-weight:600; padding:3px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.04em; }
+.booking-card .badge.pending { background:#FEF3C7; color:#92400E; }
+.booking-card .badge.confirmed { background:#D1FAE5; color:#065F46; }
+.booking-card .badge.cancelled { background:#FEE2E2; color:#991B1B; }
+.booking-card .actions { display:flex; gap:4px; }
+
+@media (max-width: 768px) {
+  .app { flex-direction: column; }
+  .sidebar { width: 100%; padding: 20px; }
+  .sidebar .sub { margin-bottom: 20px; }
+  .sidebar nav { flex-direction: row; flex-wrap: wrap; }
+  .sidebar .back { display: none; }
+  .main { padding: 20px; max-width: 100%; }
+  .form-row { grid-template-columns: 1fr; }
+  .form-row.three { grid-template-columns: 1fr; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div id="login-overlay">
+  <div class="login-box">
+    <h1>Éclats d'Instants</h1>
+    <p>Accès administrateur protégé</p>
+    <div class="form-group">
+      <label for="login-pass">Mot de passe</label>
+      <input type="password" id="login-pass" placeholder="Entrez le mot de passe" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" id="login-btn">Se connecter</button>
+    <div class="login-error" id="login-error">Mot de passe incorrect</div>
+  </div>
+</div>
+
+<div class="app" id="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h1>Éclats d'Instants</h1>
+    <div class="sub">Admin Panel</div>
+    <nav>
+      <a href="#" class="active" data-tab="gallery">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+        Galerie
+      </a>
+      <a href="#" data-tab="videos">
+        <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        Vidéos
+      </a>
+      <a href="#" data-tab="testimonials">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Témoignages
+      </a>
+      <a href="#" data-tab="calendar">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Calendrier
+      </a>
+      <a href="#" data-tab="settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        Réglages
+      </a>
+    </nav>
+    <a href="index.html" class="back">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+      Retour au site
+    </a>
+    <a href="#" id="logout-btn" class="back" style="border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;margin-top:4px;">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Déconnexion
+    </a>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ============ GALLERY TAB ============ -->
+    <div class="tab-content active" id="tab-gallery">
+      <div class="main-header">
+        <div>
+          <h2>Galerie</h2>
+          <div class="count"><span id="gallery-count">0</span> photo(s)</div>
+        </div>
+        <button class="btn btn-primary" id="show-add-gallery">+ Ajouter une photo</button>
+      </div>
+
+      <div class="section-card" id="add-gallery-form" style="display:none;">
+        <h3>Nouvelle photo</h3>
+        <div class="form-row three">
+          <div class="form-group">
+            <label>URL de l'image</label>
+            <input type="url" id="gallery-url" placeholder="https://picsum.photos/seed/...">
+          </div>
+          <div class="form-group">
+            <label>Catégorie</label>
+            <select id="gallery-cat">
+              <option value="mariage">Mariage</option>
+              <option value="anniversaire">Anniversaire</option>
+              <option value="portrait">Portrait</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <button class="btn btn-accent" id="save-gallery" style="width:100%;">Ajouter</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Texte alternatif (alt)</label>
+          <input type="text" id="gallery-alt" placeholder="Description de l'image">
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="gallery-grid" id="gallery-grid"></div>
+        <div class="empty-state" id="gallery-empty" style="display:none;">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+          <p>Aucune photo dans la galerie.<br>Ajoutez votre première photo !</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ VIDEOS TAB ============ -->
+    <div class="tab-content" id="tab-videos">
+      <div class="main-header">
+        <div>
+          <h2>Vidéos</h2>
+          <div class="count"><span id="video-count">0</span> vidéo(s)</div>
+        </div>
+        <button class="btn btn-primary" id="show-add-video">+ Ajouter une vidéo</button>
+      </div>
+
+      <div class="section-card" id="add-video-form" style="display:none;">
+        <h3>Nouvelle vidéo</h3>
+        <div class="form-row three">
+          <div class="form-group">
+            <label>URL de la vignette</label>
+            <input type="url" id="video-url" placeholder="https://picsum.photos/seed/...">
+          </div>
+          <div class="form-group">
+            <label>Titre</label>
+            <input type="text" id="video-title" placeholder="Mariage — Clara & Marc">
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <button class="btn btn-accent" id="save-video" style="width:100%;">Ajouter</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card" id="video-list"></div>
+      <div class="empty-state" id="video-empty" style="display:none;">
+        <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        <p>Aucune vidéo pour le moment.</p>
+      </div>
+    </div>
+
+    <!-- ============ TESTIMONIALS TAB ============ -->
+    <div class="tab-content" id="tab-testimonials">
+      <div class="main-header">
+        <div>
+          <h2>Témoignages</h2>
+          <div class="count"><span id="testimonial-count">0</span> témoignage(s)</div>
+        </div>
+        <button class="btn btn-primary" id="show-add-testimonial">+ Ajouter un témoignage</button>
+      </div>
+
+      <div class="section-card" id="add-testimonial-form" style="display:none;">
+        <h3>Nouveau témoignage</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nom du client</label>
+            <input type="text" id="testimonial-name" placeholder="Clara & Marc">
+          </div>
+          <div class="form-group">
+            <label>Événement et date</label>
+            <input type="text" id="testimonial-event" placeholder="Mariage, Juin 2025">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>URL photo (avatar)</label>
+            <input type="url" id="testimonial-avatar" placeholder="https://picsum.photos/seed/...">
+          </div>
+          <div class="form-group">
+            <label>Nombre d'étoiles</label>
+            <select id="testimonial-stars">
+              <option value="5">5 ★★★★★</option>
+              <option value="4">4 ★★★★</option>
+              <option value="3">3 ★★★</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Témoignage</label>
+          <textarea id="testimonial-text" placeholder="Un travail absolument magnifique..."></textarea>
+        </div>
+        <button class="btn btn-accent" id="save-testimonial">Ajouter</button>
+      </div>
+
+      <div class="section-card" id="testimonial-list"></div>
+      <div class="empty-state" id="testimonial-empty" style="display:none;">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <p>Aucun témoignage pour le moment.</p>
+      </div>
+    </div>
+
+    <!-- ============ CALENDAR TAB ============ -->
+    <div class="tab-content" id="tab-calendar">
+      <div class="main-header">
+        <h2>Calendrier des réservations</h2>
+      </div>
+
+      <div class="section-card">
+        <div class="calendar-nav">
+          <button class="btn btn-outline btn-sm" id="cal-prev"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="15 18 9 12 15 6"/></svg> Précédent</button>
+          <h3 id="cal-title">Juillet 2025</h3>
+          <button class="btn btn-outline btn-sm" id="cal-next">Suivant <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="9 18 15 12 9 6"/></svg></button>
+        </div>
+        <div class="calendar-grid" id="cal-grid"></div>
+        <div class="calendar-legend">
+          <span><span class="dot pending"></span> En attente</span>
+          <span><span class="dot confirmed"></span> Confirmé</span>
+          <span><span class="dot cancelled"></span> Annulé</span>
+        </div>
+      </div>
+
+      <div class="section-card" style="margin-bottom:0;">
+        <button class="btn btn-primary" id="show-add-booking" style="margin-bottom:0;">+ Ajouter une réservation</button>
+      </div>
+
+      <div class="section-card" id="add-booking-form" style="display:none;">
+        <h3>Nouvelle réservation</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nom du client</label>
+            <input type="text" id="booking-name" placeholder="Clara & Marc">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="booking-email" placeholder="client@email.com">
+          </div>
+        </div>
+        <div class="form-row three">
+          <div class="form-group">
+            <label>Type d'événement</label>
+            <input type="text" id="booking-event" placeholder="Mariage, Anniversaire...">
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="booking-date">
+          </div>
+          <div class="form-group">
+            <label>Pays</label>
+            <select id="booking-country" style="width:100%;padding:10px 14px;border:1px solid #E5DDD1;background:#fff;font-size:0.88rem;">
+              <option value="France">France</option>
+              <option value="Belgique">Belgique</option>
+              <option value="Suisse">Suisse</option>
+              <option value="Luxembourg">Luxembourg</option>
+              <option value="Allemagne">Allemagne</option>
+              <option value="Italie">Italie</option>
+              <option value="Espagne">Espagne</option>
+              <option value="Portugal">Portugal</option>
+              <option value="Royaume-Uni">Royaume-Uni</option>
+              <option value="Pays-Bas">Pays-Bas</option>
+              <option value="Autriche">Autriche</option>
+              <option value="Monaco">Monaco</option>
+              <option value="Andorre">Andorre</option>
+              <option value="Danemark">Danemark</option>
+              <option value="Suède">Suède</option>
+              <option value="Norvège">Norvège</option>
+              <option value="Irlande">Irlande</option>
+              <option value="République tchèque">République tchèque</option>
+              <option value="Pologne">Pologne</option>
+              <option value="Grèce">Grèce</option>
+              <option value="Croatie">Croatie</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row three">
+          <div class="form-group">
+            <label>Durée</label>
+            <select id="booking-duration" style="width:100%;padding:10px 14px;border:1px solid #E5DDD1;background:#fff;font-size:0.88rem;">
+              <option value="1h">1 heure</option>
+              <option value="2h">2 heures</option>
+              <option value="4h">½ journée (4h)</option>
+              <option value="1j" selected>1 journée</option>
+              <option value="2j">2 jours</option>
+              <option value="3j+">3 jours ou plus</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Statut</label>
+            <select id="booking-status" style="width:100%;padding:10px 14px;border:1px solid #E5DDD1;background:#fff;font-size:0.88rem;">
+              <option value="pending">En attente</option>
+              <option value="confirmed">Confirmé</option>
+              <option value="cancelled">Annulé</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <button class="btn btn-accent" id="save-booking" style="width:100%;">Ajouter</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Message / Notes</label>
+          <textarea id="booking-message" placeholder="Notes internes..." style="resize:vertical;min-height:60px;width:100%;padding:10px 14px;border:1px solid #E5DDD1;background:#fff;font-size:0.88rem;"></textarea>
+        </div>
+      </div>
+
+      <div class="section-card calendar-detail" id="cal-detail" style="display:none;">
+        <h4 id="cal-detail-title">Réservations du</h4>
+        <div id="cal-detail-list"></div>
+        <div id="cal-detail-empty" style="color:#8C8C8C;font-size:0.85rem;">Aucune réservation ce jour.</div>
+      </div>
+
+      <div class="section-card" style="margin-top:24px;">
+        <h3>Toutes les réservations</h3>
+        <div id="all-bookings"></div>
+        <div class="empty-state" id="booking-empty" style="display:none;">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <p>Aucune réservation pour le moment.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SETTINGS TAB ============ -->
+    <div class="tab-content" id="tab-settings">
+      <div class="main-header">
+        <h2>Réglages</h2>
+      </div>
+
+      <div class="section-card">
+        <h3>Données</h3>
+        <div class="setting-row">
+          <div>
+            <div class="label">Statut des données</div>
+            <div class="desc"><span id="data-status-dot" class="status-dot active"></span> <span id="data-status-text">Prêtes dans le navigateur</span></div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="label">Exporter les données</div>
+            <div class="desc">Télécharge un fichier JSON de sauvegarde</div>
+          </div>
+          <button class="btn btn-outline btn-sm" id="export-data">Exporter</button>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="label">Importer les données</div>
+            <div class="desc">Restaure une sauvegarde JSON</div>
+          </div>
+          <button class="btn btn-outline btn-sm" id="import-data">Importer</button>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="label">Réinitialiser</div>
+            <div class="desc">Remet les données par défaut du site</div>
+          </div>
+          <button class="btn btn-danger btn-sm" id="reset-data">Réinitialiser</button>
+        </div>
+        <input type="file" id="file-input" accept=".json" style="display:none;">
+      </div>
+
+      <div class="section-card">
+        <h3>Sécurité</h3>
+        <div class="setting-row">
+          <div>
+            <div class="label">Changer le mot de passe</div>
+            <div class="desc">Nouveau mot de passe pour l'accès administrateur</div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:8px;">
+          <input type="password" id="new-password" placeholder="Nouveau mot de passe" style="width:100%;padding:10px 14px;border:1px solid #D4CEC4;border-radius:8px;background:#fff;font-size:0.9rem;">
+        </div>
+        <button class="btn btn-outline btn-sm" id="change-password">Changer le mot de passe</button>
+      </div>
+
+      <div class="section-card">
+        <h3>Informations</h3>
+        <div class="setting-row">
+          <div>
+            <div class="label">Version du site</div>
+            <div class="desc">Les modifications sont sauvegardées dans votre navigateur</div>
+          </div>
+          <span style="font-size:0.8rem;color:#8C8C8C;">v2.0</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  const STORAGE_KEY = 'ec_data';
+  const PASSWORD_KEY = 'ec_admin_pass';
+  const DEFAULT_PASSWORD = 'admin123';
+
+  const DEFAULT_DATA = {
+    gallery: [
+      { id: 'w1', url: 'https://picsum.photos/seed/w1/800/1000', category: 'mariage', alt: 'Mariage — Cérémonie en extérieur' },
+      { id: 'w2', url: 'https://picsum.photos/seed/w2/600/600', category: 'mariage', alt: 'Mariage — Photo de couple' },
+      { id: 'b1', url: 'https://picsum.photos/seed/b1/600/600', category: 'anniversaire', alt: 'Anniversaire — Photo de groupe' },
+      { id: 'p1', url: 'https://picsum.photos/seed/p1/600/600', category: 'portrait', alt: 'Portrait professionnel' },
+      { id: 'b2', url: 'https://picsum.photos/seed/b2/1200/600', category: 'anniversaire', alt: 'Anniversaire — Décoration' },
+      { id: 'p2', url: 'https://picsum.photos/seed/p2/600/600', category: 'portrait', alt: 'Portrait en extérieur' },
+      { id: 'w3', url: 'https://picsum.photos/seed/w3/800/1000', category: 'mariage', alt: 'Mariage — Réception' },
+      { id: 'b3', url: 'https://picsum.photos/seed/b3/600/600', category: 'anniversaire', alt: 'Anniversaire — Gâteau' },
+      { id: 'p3', url: 'https://picsum.photos/seed/p3/600/600', category: 'portrait', alt: 'Portrait studio' }
+    ],
+    videos: [
+      { id: 'v1', url: 'https://picsum.photos/seed/v1/640/360', label: 'Mariage — Clara & Marc', alt: 'Vidéo — Mariage de Clara & Marc' },
+      { id: 'v2', url: 'https://picsum.photos/seed/v2/640/360', label: 'Anniversaire — Sophie & Philippe', alt: 'Vidéo — Anniversaire de Sophie & Philippe' },
+      { id: 'v3', url: 'https://picsum.photos/seed/v3/640/360', label: 'Highlight — Été 2025', alt: 'Vidéo — Highlight été 2025' }
+    ],
+    testimonials: [
+      { id: 't1', name: 'Clara & Marc', event: 'Mariage, Juin 2025', avatar: 'https://picsum.photos/seed/av1/100/100', stars: 5, text: 'Un travail absolument magnifique. Thomas a su capturer chaque émotion de notre mariage avec une sensibilité incroyable. Les photos sont plus belles que tout ce qu\'on aurait pu imaginer.' },
+      { id: 't2', name: 'Sophie & Philippe', event: 'Anniversaire, Mars 2025', avatar: 'https://picsum.photos/seed/av2/100/100', stars: 5, text: 'Nous avons fait appel à Éclats d\'Instants pour l\'anniversaire de nos 20 ans de mariage. Une équipe professionnelle, discrète et très talentueuse. Les vidéos sont pleines d\'émotion.' },
+      { id: 't3', name: 'Julie', event: 'Portrait, Février 2025', avatar: 'https://picsum.photos/seed/av3/100/100', stars: 5, text: 'Un vrai talent pour mettre les gens à l\'aise. La séance portrait était un pur moment de plaisir, et les résultats sont époustouflants. Je recommande les yeux fermés.' }
+    ],
+    bookings: []
+  };
+
+  function ensureDataShape(d) {
+    if (!d || typeof d !== 'object') return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    if (!Array.isArray(d.gallery) && !Array.isArray(d.videos) && !Array.isArray(d.testimonials) && !Array.isArray(d.bookings)) return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    if (!Array.isArray(d.gallery)) d.gallery = [];
+    if (!Array.isArray(d.videos)) d.videos = [];
+    if (!Array.isArray(d.testimonials)) d.testimonials = [];
+    if (!Array.isArray(d.bookings)) d.bookings = [];
+    return d;
+  }
+
+  function loadData() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') return ensureDataShape(parsed);
+      }
+    } catch(e) {}
+    return JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+
+  function saveData(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    toast('Modifications enregistrées', 'success');
+    renderAll();
+  }
+
+  function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+  var data = loadData();
+  // Repair localStorage if it was corrupted, so index.html gets clean data
+  try {
+    var rawCheck = localStorage.getItem(STORAGE_KEY);
+    if (rawCheck) {
+      var parsedCheck = JSON.parse(rawCheck);
+      if (JSON.stringify(ensureDataShape(parsedCheck)) !== rawCheck) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
+    } else {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+  } catch(e) {};
+
+  // ==================== AUTH ====================
+  var loginOverlay = document.getElementById('login-overlay');
+  var appShell = document.getElementById('app-shell');
+  var loginPass = document.getElementById('login-pass');
+  var loginBtn = document.getElementById('login-btn');
+  var loginError = document.getElementById('login-error');
+
+  function getPassword() {
+    return localStorage.getItem(PASSWORD_KEY) || DEFAULT_PASSWORD;
+  }
+
+  function checkAuth() {
+    if (sessionStorage.getItem('ec_admin') === '1') {
+      loginOverlay.classList.add('hidden');
+      appShell.style.display = 'flex';
+      document.documentElement.style.display = '';
+      return true;
+    }
+    loginOverlay.classList.remove('hidden');
+    appShell.style.display = 'none';
+    document.documentElement.style.display = '';
+    return false;
+  }
+
+  loginBtn.addEventListener('click', function() {
+    var pw = loginPass.value;
+    if (pw === getPassword()) {
+      sessionStorage.setItem('ec_admin', '1');
+      loginError.classList.remove('show');
+      loginPass.value = '';
+      checkAuth();
+    } else {
+      loginError.classList.add('show');
+    }
+  });
+
+  loginPass.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') loginBtn.click();
+  });
+
+  function logout() {
+    sessionStorage.removeItem('ec_admin');
+    checkAuth();
+  }
+
+  // === TOAST ===
+  var toastEl = document.getElementById('toast');
+  var toastTimeout;
+  function toast(msg, type) {
+    clearTimeout(toastTimeout);
+    toastEl.textContent = msg;
+    toastEl.className = 'toast' + (type ? ' ' + type : '');
+    setTimeout(function() { toastEl.classList.add('show'); }, 10);
+    toastTimeout = setTimeout(function() { toastEl.classList.remove('show'); }, 3000);
+  }
+
+  // === TABS ===
+  var tabLinks = document.querySelectorAll('.sidebar nav a');
+  tabLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      tabLinks.forEach(function(l) { l.classList.remove('active'); });
+      this.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+      document.getElementById('tab-' + this.getAttribute('data-tab')).classList.add('active');
+    });
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    logout();
+  });
+
+  // ==================== GALLERY ====================
+  function renderGallery() {
+    var grid = document.getElementById('gallery-grid');
+    var empty = document.getElementById('gallery-empty');
+    var count = document.getElementById('gallery-count');
+    grid.innerHTML = '';
+    if (!data.gallery || data.gallery.length === 0) {
+      empty.style.display = 'block';
+      count.textContent = '0';
+      return;
+    }
+    empty.style.display = 'none';
+    count.textContent = data.gallery.length;
+    data.gallery.forEach(function(item, idx) {
+      var card = document.createElement('div');
+      card.className = 'gallery-card';
+      card.innerHTML =
+        '<img src="' + item.url + '" alt="' + (item.alt || '') + '" loading="lazy">' +
+        '<div class="actions">' +
+          (idx > 0 ? '<button class="move" data-action="move-up" data-idx="' + idx + '" title="Déplacer vers la gauche"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>' : '') +
+          (idx < data.gallery.length - 1 ? '<button class="move" data-action="move-down" data-idx="' + idx + '" title="Déplacer vers la droite"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>' : '') +
+          '<button class="del" data-action="delete" data-id="' + item.id + '" title="Supprimer"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
+        '</div>' +
+        '<div class="info"><span class="cat">' + item.category + '</span><span style="font-size:0.7rem;color:#8C8C8C;">#' + (idx + 1) + '</span></div>';
+      grid.appendChild(card);
+    });
+  }
+
+  document.getElementById('show-add-gallery').addEventListener('click', function() {
+    var f = document.getElementById('add-gallery-form');
+    f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.getElementById('save-gallery').addEventListener('click', function() {
+    var url = document.getElementById('gallery-url').value.trim();
+    var cat = document.getElementById('gallery-cat').value;
+    var alt = document.getElementById('gallery-alt').value.trim();
+    if (!url) { toast('Veuillez entrer une URL', 'error'); return; }
+    data.gallery = data.gallery || [];
+    data.gallery.push({ id: genId(), url: url, category: cat, alt: alt || '' });
+    saveData(data);
+    document.getElementById('gallery-url').value = '';
+    document.getElementById('gallery-alt').value = '';
+  });
+
+  document.getElementById('gallery-grid').addEventListener('click', function(e) {
+    var btn = e.target.closest('button');
+    if (!btn) return;
+    var action = btn.getAttribute('data-action');
+    if (action === 'delete') {
+      var id = btn.getAttribute('data-id');
+      data.gallery = data.gallery.filter(function(i) { return i.id !== id; });
+      saveData(data);
+    } else if (action === 'move-up') {
+      var idx = parseInt(btn.getAttribute('data-idx'), 10);
+      if (idx > 0) {
+        var tmp = data.gallery[idx];
+        data.gallery[idx] = data.gallery[idx - 1];
+        data.gallery[idx - 1] = tmp;
+        saveData(data);
+      }
+    } else if (action === 'move-down') {
+      var idx2 = parseInt(btn.getAttribute('data-idx'), 10);
+      if (idx2 < data.gallery.length - 1) {
+        var tmp2 = data.gallery[idx2];
+        data.gallery[idx2] = data.gallery[idx2 + 1];
+        data.gallery[idx2 + 1] = tmp2;
+        saveData(data);
+      }
+    }
+  });
+
+  // ==================== VIDEOS ====================
+  function renderVideos() {
+    var list = document.getElementById('video-list');
+    var empty = document.getElementById('video-empty');
+    var count = document.getElementById('video-count');
+    list.innerHTML = '';
+    if (!data.videos || data.videos.length === 0) {
+      empty.style.display = 'block';
+      count.textContent = '0';
+      return;
+    }
+    empty.style.display = 'none';
+    count.textContent = data.videos.length;
+    data.videos.forEach(function(item) {
+      var card = document.createElement('div');
+      card.className = 'video-card';
+      card.innerHTML =
+        '<img src="' + item.url + '" alt="" loading="lazy">' +
+        '<div class="info"><strong>' + item.label + '</strong></div>' +
+        '<button class="btn btn-danger btn-sm" data-id="' + item.id + '" data-action="del-video">Supprimer</button>';
+      list.appendChild(card);
+    });
+  }
+
+  document.getElementById('show-add-video').addEventListener('click', function() {
+    var f = document.getElementById('add-video-form');
+    f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.getElementById('save-video').addEventListener('click', function() {
+    var url = document.getElementById('video-url').value.trim();
+    var label = document.getElementById('video-title').value.trim();
+    if (!url || !label) { toast('Veuillez remplir tous les champs', 'error'); return; }
+    data.videos = data.videos || [];
+    data.videos.push({ id: genId(), url: url, label: label, alt: 'Vidéo — ' + label });
+    saveData(data);
+    document.getElementById('video-url').value = '';
+    document.getElementById('video-title').value = '';
+  });
+
+  document.getElementById('video-list').addEventListener('click', function(e) {
+    var btn = e.target.closest('button');
+    if (!btn) return;
+    if (btn.getAttribute('data-action') === 'del-video') {
+      var id = btn.getAttribute('data-id');
+      data.videos = data.videos.filter(function(i) { return i.id !== id; });
+      saveData(data);
+    }
+  });
+
+  // ==================== TESTIMONIALS ====================
+  function renderTestimonials() {
+    var list = document.getElementById('testimonial-list');
+    var empty = document.getElementById('testimonial-empty');
+    var count = document.getElementById('testimonial-count');
+    list.innerHTML = '';
+    if (!data.testimonials || data.testimonials.length === 0) {
+      empty.style.display = 'block';
+      count.textContent = '0';
+      return;
+    }
+    empty.style.display = 'none';
+    count.textContent = data.testimonials.length;
+    data.testimonials.forEach(function(item) {
+      var stars = '';
+      for (var s = 0; s < (item.stars || 5); s++) stars += '★';
+      var card = document.createElement('div');
+      card.className = 'video-card';
+      card.innerHTML =
+        '<img src="' + item.avatar + '" alt="" style="width:44px;height:44px;border-radius:50%;" loading="lazy">' +
+        '<div class="info"><strong>' + item.name + '</strong><span>' + item.event + ' · ' + stars + '</span></div>' +
+        '<button class="btn btn-danger btn-sm" data-id="' + item.id + '" data-action="del-testimonial">Supprimer</button>';
+      list.appendChild(card);
+    });
+  }
+
+  document.getElementById('show-add-testimonial').addEventListener('click', function() {
+    var f = document.getElementById('add-testimonial-form');
+    f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.getElementById('save-testimonial').addEventListener('click', function() {
+    var name = document.getElementById('testimonial-name').value.trim();
+    var event = document.getElementById('testimonial-event').value.trim();
+    var avatar = document.getElementById('testimonial-avatar').value.trim();
+    var stars = parseInt(document.getElementById('testimonial-stars').value, 10);
+    var text = document.getElementById('testimonial-text').value.trim();
+    if (!name || !text) { toast('Veuillez remplir le nom et le témoignage', 'error'); return; }
+    data.testimonials = data.testimonials || [];
+    data.testimonials.push({ id: genId(), name: name, event: event, avatar: avatar || 'https://picsum.photos/seed/' + genId() + '/100/100', stars: stars, text: text });
+    saveData(data);
+    document.getElementById('testimonial-name').value = '';
+    document.getElementById('testimonial-event').value = '';
+    document.getElementById('testimonial-avatar').value = '';
+    document.getElementById('testimonial-text').value = '';
+  });
+
+  document.getElementById('testimonial-list').addEventListener('click', function(e) {
+    var btn = e.target.closest('button');
+    if (!btn) return;
+    if (btn.getAttribute('data-action') === 'del-testimonial') {
+      var id = btn.getAttribute('data-id');
+      data.testimonials = data.testimonials.filter(function(i) { return i.id !== id; });
+      saveData(data);
+    }
+  });
+
+  // ==================== SETTINGS ====================
+  document.getElementById('export-data').addEventListener('click', function() {
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'eclats-data-backup.json';
+    a.click();
+    toast('Données exportées', 'success');
+  });
+
+  document.getElementById('import-data').addEventListener('click', function() {
+    document.getElementById('file-input').click();
+  });
+
+  document.getElementById('file-input').addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        var imported = JSON.parse(ev.target.result);
+        if (imported && typeof imported === 'object') {
+          data = ensureDataShape(imported);
+          saveData(data);
+          toast('Données importées avec succès', 'success');
+        } else {
+          toast('Fichier invalide', 'error');
+        }
+      } catch(err) {
+        toast('Fichier JSON invalide', 'error');
+      }
+    };
+    reader.readAsText(file);
+    this.value = '';
+  });
+
+  document.getElementById('reset-data').addEventListener('click', function() {
+    if (confirm('Réinitialiser toutes les données ? Cette action est irréversible.')) {
+      data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+      saveData(data);
+      toast('Données réinitialisées', 'success');
+    }
+  });
+
+  document.getElementById('change-password').addEventListener('click', function() {
+    var newPw = document.getElementById('new-password').value.trim();
+    if (newPw.length < 4) { toast('Minimum 4 caractères', 'error'); return; }
+    localStorage.setItem(PASSWORD_KEY, newPw);
+    document.getElementById('new-password').value = '';
+    toast('Mot de passe modifié avec succès', 'success');
+  });
+
+  // ==================== RENDER ALL ====================
+  function renderAll() {
+    renderGallery();
+    renderVideos();
+    renderTestimonials();
+    var glen = data.gallery ? data.gallery.length : 0;
+    var vlen = data.videos ? data.videos.length : 0;
+    var tlen = data.testimonials ? data.testimonials.length : 0;
+    document.getElementById('data-status-text').textContent = glen + ' photos, ' + vlen + ' vidéos, ' + tlen + ' témoignages';
+  }
+
+  // ==================== MANUAL BOOKING ADD ====================
+  document.getElementById('show-add-booking').addEventListener('click', function() {
+    var f = document.getElementById('add-booking-form');
+    f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.getElementById('save-booking').addEventListener('click', function() {
+    var name = document.getElementById('booking-name').value.trim();
+    var email = document.getElementById('booking-email').value.trim();
+    var eventType = document.getElementById('booking-event').value.trim();
+    var eventDate = document.getElementById('booking-date').value;
+    var country = document.getElementById('booking-country').value;
+    var duration = document.getElementById('booking-duration').value;
+    var status = document.getElementById('booking-status').value;
+    var message = document.getElementById('booking-message').value.trim();
+    if (!name || !eventDate) { toast('Veuillez remplir le nom et la date', 'error'); return; }
+    data.bookings = data.bookings || [];
+    data.bookings.push({
+      id: 'b' + Date.now(),
+      clientName: name,
+      email: email || '',
+      eventType: eventType || 'Non spécifié',
+      eventDate: eventDate,
+      country: country,
+      duration: duration,
+      message: message || '',
+      status: status,
+      createdAt: new Date().toISOString().split('T')[0]
+    });
+    saveData(data);
+    document.getElementById('booking-name').value = '';
+    document.getElementById('booking-email').value = '';
+    document.getElementById('booking-event').value = '';
+    document.getElementById('booking-date').value = '';
+    document.getElementById('booking-message').value = '';
+  });
+
+  // ==================== CALENDAR ====================
+  var calDate = new Date();
+  calDate.setDate(1);
+
+  var MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  var MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var DAYS_FR = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  var DAYS_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  function getLang() { return localStorage.getItem('ec_lang') === 'en' ? 'en' : 'fr'; }
+  function months() { return getLang() === 'en' ? MONTHS_EN : MONTHS_FR; }
+  function days() { return getLang() === 'en' ? DAYS_EN : DAYS_FR; }
+
+  function getBookingsForDate(dateStr) {
+    return (data.bookings || []).filter(function(b) { return b.eventDate === dateStr; });
+  }
+
+  function statusClass(s) { return s === 'confirmed' ? 'confirmed' : s === 'cancelled' ? 'cancelled' : 'pending'; }
+
+  function renderCalendar() {
+    var year = calDate.getFullYear();
+    var month = calDate.getMonth();
+    var grid = document.getElementById('cal-grid');
+    var title = document.getElementById('cal-title');
+    title.textContent = months()[month] + ' ' + year;
+
+    var firstDay = new Date(year, month, 1).getDay();
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    var prevMonthDays = new Date(year, month, 0).getDate();
+    var today = new Date();
+    var todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
+    grid.innerHTML = '';
+    var dayNames = days();
+    dayNames.forEach(function(d) {
+      var h = document.createElement('div');
+      h.className = 'day-header';
+      h.textContent = d;
+      grid.appendChild(h);
+    });
+
+    var totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+
+    for (var i = 0; i < totalCells; i++) {
+      var cell = document.createElement('div');
+      cell.className = 'day';
+
+      var dayNum, dateStr, isOther = false;
+      if (i < firstDay) {
+        dayNum = prevMonthDays - firstDay + 1 + i;
+        dateStr = year + '-' + String(month).padStart(2, '0') + '-' + String(dayNum).padStart(2, '0');
+        cell.classList.add('other-month');
+        isOther = true;
+      } else if (i >= firstDay + daysInMonth) {
+        dayNum = i - firstDay - daysInMonth + 1;
+        dateStr = year + '-' + String(month + 2).padStart(2, '0') + '-' + String(dayNum).padStart(2, '0');
+        cell.classList.add('other-month');
+        isOther = true;
+      } else {
+        var d = i - firstDay + 1;
+        dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        dayNum = d;
+      }
+
+      var numEl = document.createElement('div');
+      numEl.className = 'num';
+      numEl.textContent = dayNum;
+      cell.appendChild(numEl);
+
+      if (!isOther && dateStr === todayStr) {
+        cell.classList.add('today');
+      }
+
+      var events = getBookingsForDate(dateStr);
+      if (events.length > 0) {
+        var evContainer = document.createElement('div');
+        evContainer.className = 'events';
+        events.forEach(function(ev) {
+          var e = document.createElement('div');
+          e.className = 'event ' + statusClass(ev.status);
+          e.textContent = ev.clientName;
+          evContainer.appendChild(e);
+        });
+        cell.appendChild(evContainer);
+      }
+
+      cell.setAttribute('data-date', dateStr);
+      cell.addEventListener('click', function() {
+        var date = this.getAttribute('data-date');
+        showDayDetail(date);
+      });
+
+      grid.appendChild(cell);
+    }
+  }
+
+  function showDayDetail(dateStr) {
+    var bookings = getBookingsForDate(dateStr);
+    var detail = document.getElementById('cal-detail');
+    var title = document.getElementById('cal-detail-title');
+    var list = document.getElementById('cal-detail-list');
+    var empty = document.getElementById('cal-detail-empty');
+
+    var d = new Date(dateStr + 'T12:00:00');
+    var formatted = d.getDate() + ' ' + months()[d.getMonth()] + ' ' + d.getFullYear();
+    title.textContent = 'Réservations du ' + formatted;
+    detail.style.display = 'block';
+
+    list.innerHTML = '';
+    if (bookings.length === 0) {
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    bookings.forEach(function(b) {
+      var card = document.createElement('div');
+      card.className = 'booking-card';
+      card.innerHTML =
+        '<div class="info">' +
+          '<strong>' + b.clientName + '</strong>' +
+          '<span>' + (b.eventType || 'Événement') + ' · ' + (b.country || 'France') + ' · ' + (b.duration || '') + ' · ' + b.email + '</span>' +
+          '<span style="display:block;font-size:0.72rem;color:#A3A3A3;margin-top:2px;">' + (b.message || '') + '</span>' +
+        '</div>' +
+        '<span class="badge ' + statusClass(b.status) + '">' + (b.status === 'confirmed' ? 'Confirmé' : b.status === 'cancelled' ? 'Annulé' : 'En attente') + '</span>' +
+        '<div class="actions">' +
+          (b.status === 'pending' ? '<button class="btn btn-sm btn-primary" data-action="confirm-booking" data-id="' + b.id + '" title="Confirmer">✓</button>' : '') +
+          (b.status !== 'cancelled' ? '<button class="btn btn-sm btn-danger" data-action="cancel-booking" data-id="' + b.id + '" title="Annuler">✕</button>' : '') +
+          '<button class="btn btn-sm btn-outline" data-action="delete-booking" data-id="' + b.id + '" title="Supprimer définitivement" style="color:#DC2626;border-color:#FECACA;">🗑</button>' +
+        '</div>';
+      list.appendChild(card);
+    });
+  }
+
+  document.getElementById('cal-prev').addEventListener('click', function() {
+    calDate.setMonth(calDate.getMonth() - 1);
+    renderCalendar();
+    document.getElementById('cal-detail').style.display = 'none';
+  });
+
+  document.getElementById('cal-next').addEventListener('click', function() {
+    calDate.setMonth(calDate.getMonth() + 1);
+    renderCalendar();
+    document.getElementById('cal-detail').style.display = 'none';
+  });
+
+  function handleBookingAction(e) {
+    var btn = e.target.closest('button');
+    if (!btn) return;
+    var action = btn.getAttribute('data-action');
+    var id = btn.getAttribute('data-id');
+    if (action === 'confirm-booking') {
+      var b = data.bookings.find(function(x) { return x.id === id; });
+      if (b) { b.status = 'confirmed'; saveData(data); }
+    } else if (action === 'cancel-booking') {
+      var b2 = data.bookings.find(function(x) { return x.id === id; });
+      if (b2) { b2.status = 'cancelled'; saveData(data); }
+    } else if (action === 'delete-booking') {
+      if (confirm('Supprimer définitivement cette réservation ?')) {
+        data.bookings = data.bookings.filter(function(x) { return x.id !== id; });
+        saveData(data);
+      }
+    }
+  }
+  document.getElementById('cal-detail-list').addEventListener('click', handleBookingAction);
+  document.getElementById('all-bookings').addEventListener('click', handleBookingAction);
+
+  function renderAllBookings() {
+    var list = document.getElementById('all-bookings');
+    var empty = document.getElementById('booking-empty');
+    list.innerHTML = '';
+    if (!data.bookings || data.bookings.length === 0) {
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    data.bookings.slice().reverse().forEach(function(b) {
+      var card = document.createElement('div');
+      card.className = 'booking-card';
+      card.innerHTML =
+        '<div class="info">' +
+          '<strong>' + b.clientName + ' <span style="font-weight:400;color:#8C8C8C;font-size:0.75rem;">— ' + b.eventDate + '</span></strong>' +
+          '<span>' + (b.eventType || 'Événement') + ' · ' + (b.country || 'France') + ' · ' + (b.duration || '') + ' · ' + b.email + '</span>' +
+          '<span style="display:block;font-size:0.72rem;color:#A3A3A3;margin-top:2px;">' + (b.message || '') + '</span>' +
+        '</div>' +
+        '<span class="badge ' + statusClass(b.status) + '">' + (b.status === 'confirmed' ? 'Confirmé' : b.status === 'cancelled' ? 'Annulé' : 'En attente') + '</span>' +
+        '<div class="actions">' +
+          (b.status === 'pending' ? '<button class="btn btn-sm btn-primary" data-action="confirm-booking" data-id="' + b.id + '">✓</button>' : '') +
+          (b.status !== 'cancelled' ? '<button class="btn btn-sm btn-danger" data-action="cancel-booking" data-id="' + b.id + '">✕</button>' : '') +
+          '<button class="btn btn-sm btn-outline" data-action="delete-booking" data-id="' + b.id + '" style="color:#DC2626;border-color:#FECACA;">🗑</button>' +
+        '</div>';
+      list.appendChild(card);
+    });
+  }
+
+  // Override renderAll to include calendar
+  var _origRenderAll = renderAll;
+  renderAll = function() {
+    _origRenderAll();
+    renderCalendar();
+    renderAllBookings();
+    var blen = data.bookings ? data.bookings.length : 0;
+    var glen = data.gallery ? data.gallery.length : 0;
+    var vlen = data.videos ? data.videos.length : 0;
+    var tlen = data.testimonials ? data.testimonials.length : 0;
+    document.getElementById('data-status-text').textContent = glen + ' photos, ' + vlen + ' vidéos, ' + tlen + ' témoignages, ' + blen + ' réservations';
+  };
+
+  if (checkAuth()) renderAll();
+
+  window.__data = data;
+})();
+</script>
+</body>
+</html>
