@@ -1678,6 +1678,74 @@ footer p { font-size: 0.75rem; line-height: 1.6; }
   }, { passive: true });
 
   // ==============================
+  // TRAVEL MATRIX
+  // ==============================
+  var TRAVEL_HOURS = {
+    'France|Belgique': 3, 'France|Suisse': 5, 'France|Luxembourg': 4, 'France|Allemagne': 6,
+    'France|Italie': 7, 'France|Espagne': 11, 'France|Portugal': 15, 'France|Royaume-Uni': 6,
+    'France|Pays-Bas': 6, 'France|Autriche': 8, 'France|Monaco': 6, 'France|Andorre': 9,
+    'France|Danemark': 11, 'France|Suède': 14, 'France|Norvège': 16, 'France|Irlande': 8,
+    'France|République tchèque': 10, 'France|Pologne': 12, 'France|Grèce': 20, 'France|Croatie': 13,
+    'Belgique|Suisse': 6, 'Belgique|Allemagne': 5, 'Belgique|Pays-Bas': 3, 'Belgique|Luxembourg': 3,
+    'Belgique|Royaume-Uni': 6, 'Belgique|Italie': 10, 'Belgique|Espagne': 14, 'Belgique|Autriche': 10,
+    'Belgique|Danemark': 9, 'Belgique|Suède': 13, 'Belgique|Norvège': 15, 'Belgique|Irlande': 8,
+    'Belgique|République tchèque': 9, 'Belgique|Pologne': 11, 'Belgique|Croatie': 13, 'Belgique|Grèce': 20,
+    'Suisse|Allemagne': 5, 'Suisse|Italie': 4, 'Suisse|Autriche': 6, 'Suisse|Espagne': 13,
+    'Suisse|Pays-Bas': 8, 'Suisse|Royaume-Uni': 8, 'Suisse|Luxembourg': 5, 'Suisse|Portugal': 17,
+    'Suisse|Monaco': 6, 'Suisse|Andorre': 11, 'Suisse|Danemark': 10, 'Suisse|Suède': 14,
+    'Suisse|Norvège': 16, 'Suisse|Irlande': 10, 'Suisse|République tchèque': 8, 'Suisse|Pologne': 11,
+    'Suisse|Grèce': 18, 'Suisse|Croatie': 11, 'Allemagne|Italie': 9, 'Allemagne|Espagne': 16,
+    'Allemagne|Pays-Bas': 5, 'Allemagne|Royaume-Uni': 8, 'Allemagne|Autriche': 6, 'Allemagne|Portugal': 20,
+    'Allemagne|Luxembourg': 2, 'Allemagne|Monaco': 8, 'Allemagne|Andorre': 14, 'Allemagne|Danemark': 5,
+    'Allemagne|Suède': 9, 'Allemagne|Norvège': 12, 'Allemagne|Irlande': 10, 'Allemagne|République tchèque': 4,
+    'Allemagne|Pologne': 6, 'Allemagne|Grèce': 18, 'Allemagne|Croatie': 11, 'Italie|Espagne': 14,
+    'Italie|Pays-Bas': 12, 'Italie|Royaume-Uni': 12, 'Italie|Autriche': 7, 'Italie|Portugal': 18,
+    'Italie|Luxembourg': 8, 'Italie|Monaco': 5, 'Italie|Andorre': 12, 'Italie|Danemark': 14,
+    'Italie|Suède': 17, 'Italie|Norvège': 19, 'Italie|Irlande': 14, 'Italie|République tchèque': 9,
+    'Italie|Pologne': 12, 'Italie|Grèce': 14, 'Italie|Croatie': 8, 'Espagne|Portugal': 10,
+    'Espagne|Royaume-Uni': 10, 'Espagne|Pays-Bas': 16, 'Espagne|Autriche': 16, 'Espagne|Luxembourg': 14,
+    'Espagne|Andorre': 6, 'Espagne|Danemark': 18, 'Espagne|Suède': 22, 'Espagne|Norvège': 24,
+    'Espagne|Irlande': 12, 'Espagne|République tchèque': 16, 'Espagne|Pologne': 18, 'Espagne|Grèce': 20,
+    'Espagne|Croatie': 16, 'Espagne|Monaco': 12, 'Portugal|Royaume-Uni': 12, 'Portugal|Pays-Bas': 18,
+    'Portugal|Autriche': 18, 'Portugal|Luxembourg': 16, 'Portugal|Monaco': 16, 'Portugal|Andorre': 13,
+    'Portugal|Danemark': 20, 'Portugal|Suède': 24, 'Portugal|Norvège': 26, 'Portugal|Irlande': 14,
+    'Portugal|République tchèque': 18, 'Portugal|Pologne': 20, 'Portugal|Grèce': 22, 'Portugal|Croatie': 18,
+    'Royaume-Uni|Pays-Bas': 5, 'Royaume-Uni|Autriche': 10, 'Royaume-Uni|Luxembourg': 6,
+    'Royaume-Uni|Monaco': 10, 'Royaume-Uni|Andorre': 10, 'Royaume-Uni|Danemark': 8,
+    'Royaume-Uni|Suède': 10, 'Royaume-Uni|Norvège': 12, 'Royaume-Uni|Irlande': 3,
+    'Royaume-Uni|République tchèque': 10, 'Royaume-Uni|Pologne': 12, 'Royaume-Uni|Grèce': 18,
+    'Royaume-Uni|Croatie': 14, 'Pays-Bas|Autriche': 10, 'Pays-Bas|Luxembourg': 3, 'Pays-Bas|Danemark': 7,
+    'Pays-Bas|Suède': 11, 'Pays-Bas|Norvège': 14, 'Pays-Bas|Irlande': 8, 'Pays-Bas|République tchèque': 8,
+    'Pays-Bas|Pologne': 10, 'Pays-Bas|Grèce': 20, 'Pays-Bas|Croatie': 13, 'Pays-Bas|Monaco': 10,
+    'Pays-Bas|Andorre': 14, 'Pays-Bas|Espagne': 16, 'Pays-Bas|Portugal': 20,
+    'Autriche|Espagne': 16, 'Autriche|Portugal': 20, 'Autriche|Luxembourg': 8, 'Autriche|Monaco': 9,
+    'Autriche|Andorre': 14, 'Autriche|Danemark': 10, 'Autriche|Suède': 14, 'Autriche|Norvège': 16,
+    'Autriche|Irlande': 14, 'Autriche|République tchèque': 4, 'Autriche|Pologne': 6, 'Autriche|Grèce': 14,
+    'Autriche|Croatie': 5, 'Luxembourg|Monaco': 7, 'Luxembourg|Andorre': 11, 'Luxembourg|Danemark': 9,
+    'Luxembourg|Suède': 13, 'Luxembourg|Norvège': 15, 'Luxembourg|Irlande': 8, 'Luxembourg|République tchèque': 7,
+    'Luxembourg|Pologne': 10, 'Luxembourg|Grèce': 19, 'Luxembourg|Croatie': 12,
+    'Danemark|Suède': 5, 'Danemark|Norvège': 8, 'Danemark|Irlande': 10, 'Danemark|République tchèque': 8,
+    'Danemark|Pologne': 7, 'Danemark|Grèce': 22, 'Danemark|Croatie': 14,
+    'Suède|Norvège': 5, 'Suède|Irlande': 12, 'Suède|République tchèque': 12, 'Suède|Pologne': 10,
+    'Suède|Grèce': 24, 'Suède|Croatie': 16, 'Norvège|Irlande': 10, 'Norvège|République tchèque': 14,
+    'Norvège|Pologne': 12, 'Norvège|Grèce': 26, 'Norvège|Croatie': 18,
+    'Irlande|République tchèque': 14, 'Irlande|Pologne': 16, 'Irlande|Grèce': 22, 'Irlande|Croatie': 16,
+    'République tchèque|Pologne': 5, 'République tchèque|Grèce': 16, 'République tchèque|Croatie': 8,
+    'Pologne|Grèce': 18, 'Pologne|Croatie': 12, 'Grèce|Croatie': 10
+  };
+
+  function getTravelHours(a, b) {
+    if (a === b) return 0;
+    return TRAVEL_HOURS[a + '|' + b] || TRAVEL_HOURS[b + '|' + a] || 48;
+  }
+  function getDurationDays(dur) {
+    if (!dur) return 1;
+    if (dur === '2j') return 2;
+    if (dur === '3j+') return 3;
+    return 1;
+  }
+
+  // ==============================
   // FORM
   // ==============================
   document.querySelector('form').addEventListener('submit', function(e) {
