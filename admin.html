@@ -1281,14 +1281,14 @@ a { text-decoration: none; color: inherit; }
 
       var gapDays = Math.round((gapEnd - gapStart) / (1000 * 60 * 60 * 24));
       var travel = getTravelHours(travelCountryFrom, travelCountryTo);
-      var minDaysNeeded = Math.ceil(travel / 10) + 1; // ~10h de route/jour max + 1 jour de repos
+      var minDaysNeeded = Math.ceil(travel / 10); // ~10h de route/jour max
 
       if (gapDays < minDaysNeeded) {
         conflicts.push({
           booking: b,
           type: 'travel',
           msg: 'Trajet ' + travelCountryFrom + ' → ' + travelCountryTo + ' : ~' + travel + 'h de route. '
-               + 'Besoin de ' + minDaysNeeded + 'j de repos, mais seulement ' + gapDays + 'j de disponibilité entre "' + b.clientName + '" (' + dateStr(bEnd) + ') et "' + newBooking.clientName + '" (' + newBooking.eventDate + ')'
+               + 'Besoin de ' + minDaysNeeded + 'j de trajet, mais seulement ' + gapDays + 'j entre "' + b.clientName + '" (' + dateStr(bEnd) + ') et "' + newBooking.clientName + '" (' + newBooking.eventDate + ')'
         });
       }
     }
