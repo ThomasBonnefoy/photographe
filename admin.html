@@ -767,8 +767,8 @@ a { text-decoration: none; color: inherit; }
 (function() {
   'use strict';
 
-  const STORAGE_KEY = 'ec_data';
-  const PASSWORD_KEY = 'ec_admin_pass';
+  const STORAGE_KEY = 'rs_data';
+  const PASSWORD_KEY = 'rs_admin_pass';
   const DEFAULT_PASSWORD = 'admin123';
 
   const DEFAULT_DATA = {
@@ -783,16 +783,8 @@ a { text-decoration: none; color: inherit; }
       { id: 'b3', url: 'https://picsum.photos/seed/b3/600/600', category: 'anniversaire', alt: 'Anniversaire — Gâteau' },
       { id: 'p3', url: 'https://picsum.photos/seed/p3/600/600', category: 'portrait', alt: 'Portrait studio' }
     ],
-    videos: [
-      { id: 'v1', url: 'https://picsum.photos/seed/v1/640/360', label: 'Mariage — Clara & Marc', alt: 'Vidéo — Mariage de Clara & Marc' },
-      { id: 'v2', url: 'https://picsum.photos/seed/v2/640/360', label: 'Anniversaire — Sophie & Philippe', alt: 'Vidéo — Anniversaire de Sophie & Philippe' },
-      { id: 'v3', url: 'https://picsum.photos/seed/v3/640/360', label: 'Highlight — Été 2025', alt: 'Vidéo — Highlight été 2025' }
-    ],
-    testimonials: [
-      { id: 't1', name: 'Clara & Marc', event: 'Mariage, Juin 2025', avatar: 'https://picsum.photos/seed/av1/100/100', stars: 5, text: 'Un travail absolument magnifique. Thomas a su capturer chaque émotion de notre mariage avec une sensibilité incroyable. Les photos sont plus belles que tout ce qu\'on aurait pu imaginer.' },
-      { id: 't2', name: 'Sophie & Philippe', event: 'Anniversaire, Mars 2025', avatar: 'https://picsum.photos/seed/av2/100/100', stars: 5, text: 'Nous avons fait appel à Éclats d\'Instants pour l\'anniversaire de nos 20 ans de mariage. Une équipe professionnelle, discrète et très talentueuse. Les vidéos sont pleines d\'émotion.' },
-      { id: 't3', name: 'Julie', event: 'Portrait, Février 2025', avatar: 'https://picsum.photos/seed/av3/100/100', stars: 5, text: 'Un vrai talent pour mettre les gens à l\'aise. La séance portrait était un pur moment de plaisir, et les résultats sont époustouflants. Je recommande les yeux fermés.' }
-    ],
+    videos: [],
+    testimonials: [],
     bookings: []
   };
 
@@ -851,7 +843,7 @@ a { text-decoration: none; color: inherit; }
   }
 
   function checkAuth() {
-    if (sessionStorage.getItem('ec_admin') === '1') {
+    if (sessionStorage.getItem('rs_admin') === '1') {
       loginOverlay.classList.add('hidden');
       appShell.style.display = 'flex';
       document.documentElement.style.display = '';
@@ -866,10 +858,10 @@ a { text-decoration: none; color: inherit; }
   loginBtn.addEventListener('click', function() {
     var pw = loginPass.value;
     if (pw === getPassword()) {
-      sessionStorage.setItem('ec_admin', '1');
+      sessionStorage.setItem('rs_admin', '1');
       loginError.classList.remove('show');
       loginPass.value = '';
-      checkAuth();
+      if (checkAuth()) renderAll();
     } else {
       loginError.classList.add('show');
     }
@@ -880,7 +872,7 @@ a { text-decoration: none; color: inherit; }
   });
 
   function logout() {
-    sessionStorage.removeItem('ec_admin');
+    sessionStorage.removeItem('rs_admin');
     checkAuth();
   }
 
@@ -1096,7 +1088,7 @@ a { text-decoration: none; color: inherit; }
     var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'eclats-data-backup.json';
+    a.download = 'readystudio-data-backup.json';
     a.click();
     toast('Données exportées', 'success');
   });
@@ -1348,7 +1340,7 @@ a { text-decoration: none; color: inherit; }
   var DAYS_FR = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
   var DAYS_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-  function getLang() { return localStorage.getItem('ec_lang') === 'en' ? 'en' : 'fr'; }
+  function getLang() { return localStorage.getItem('rs_lang') === 'en' ? 'en' : 'fr'; }
   function months() { return getLang() === 'en' ? MONTHS_EN : MONTHS_FR; }
   function days() { return getLang() === 'en' ? DAYS_EN : DAYS_FR; }
 
