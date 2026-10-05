@@ -771,6 +771,15 @@ footer p { font-size: 0.75rem; line-height: 1.6; }
 .footer-social { display: flex; justify-content: center; gap: 20px; margin-bottom: 24px; }
 .footer-social a { color: rgba(255,255,255,0.25); transition: color 0.3s; }
 .footer-social a:hover { color: #C4A06A; }
+.footer-admin {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 16px;
+  font-size: 0.7rem; letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.3);
+  transition: color 0.3s;
+}
+.footer-admin:hover { color: #C4A06A; }
+.footer-admin svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; }
 .footer-social svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; }
 
 /* === FLOATING CTA === */
@@ -1078,6 +1087,7 @@ footer p { font-size: 0.75rem; line-height: 1.6; }
     </div>
     <div class="logo">Ready Studio</div>
     <p data-i18n="footer-copyright">&copy; 2026 — Photographie & Vidéo. Tous droits réservés.</p>
+    <a href="admin.html" class="footer-admin"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="footer-admin">Espace Ready Studio</span></a>
   </div>
 </footer>
 
@@ -1161,7 +1171,8 @@ footer p { font-size: 0.75rem; line-height: 1.6; }
       'wa-intro': 'Bonjour Ready Studio, je souhaite un devis.',
       'wa-name': 'Nom', 'wa-email': 'Email', 'wa-event': 'Événement', 'wa-date': 'Date',
       'wa-country': 'Pays', 'wa-duration': 'Durée', 'wa-message': 'Message',
-      'footer-copyright': '© 2026 — Photographie & Vidéo. Tous droits réservés.'
+      'footer-copyright': '© 2026 — Photographie & Vidéo. Tous droits réservés.',
+      'footer-admin': 'Espace Ready Studio'
     },
     en: {
       'site-title': 'Ready Studio — Wedding & Event Photography',
@@ -1208,7 +1219,8 @@ footer p { font-size: 0.75rem; line-height: 1.6; }
       'wa-intro': 'Hello Ready Studio, I would like a quote.',
       'wa-name': 'Name', 'wa-email': 'Email', 'wa-event': 'Event', 'wa-date': 'Date',
       'wa-country': 'Country', 'wa-duration': 'Duration', 'wa-message': 'Message',
-      'footer-copyright': '© 2026 — Photography & Video. All rights reserved.'
+      'footer-copyright': '© 2026 — Photography & Video. All rights reserved.',
+      'footer-admin': 'Ready Studio area'
     }
   };
 
