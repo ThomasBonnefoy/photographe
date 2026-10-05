@@ -27,6 +27,8 @@ a { text-decoration: none; color: inherit; }
   background: #1A1A1A;
 }
 #login-overlay.hidden { display: none; }
+.upload-status { font-size: 0.8rem; color: #8C8C8C; min-height: 1.2em; }
+.upload-status.error { color: #DC2626; }
 .login-box {
   background: #F3F0EB; padding: 48px 40px; border-radius: 16px;
   width: 360px; max-width: 92vw;
@@ -390,19 +392,6 @@ a { text-decoration: none; color: inherit; }
 </head>
 <body>
 
-<div id="login-overlay">
-  <div class="login-box">
-    <h1>Ready Studio</h1>
-    <p>Accès administrateur protégé</p>
-    <div class="form-group">
-      <label for="login-pass">Mot de passe</label>
-      <input type="password" id="login-pass" placeholder="Entrez le mot de passe" autocomplete="off">
-    </div>
-    <button class="btn btn-primary" id="login-btn">Se connecter</button>
-    <div class="login-error" id="login-error">Mot de passe incorrect</div>
-  </div>
-</div>
-
 <div class="app" id="app-shell">
 
   <!-- SIDEBAR -->
@@ -435,10 +424,6 @@ a { text-decoration: none; color: inherit; }
       <svg viewBox="0 0 24 24"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
       Retour au site
     </a>
-    <a href="#" id="logout-btn" class="back" style="border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;margin-top:4px;">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Déconnexion
-    </a>
   </aside>
 
   <!-- MAIN -->
@@ -455,11 +440,11 @@ a { text-decoration: none; color: inherit; }
       </div>
 
       <div class="section-card" id="add-gallery-form" style="display:none;">
-        <h3>Nouvelle photo</h3>
+        <h3>Nouvelles photos</h3>
         <div class="form-row three">
           <div class="form-group">
-            <label>URL de l'image</label>
-            <input type="url" id="gallery-url" placeholder="https://picsum.photos/seed/...">
+            <label>Photos depuis l'appareil</label>
+            <input type="file" id="gallery-files" accept="image/*" multiple>
           </div>
           <div class="form-group">
             <label>Catégorie</label>
@@ -474,10 +459,17 @@ a { text-decoration: none; color: inherit; }
             <button class="btn btn-accent" id="save-gallery" style="width:100%;">Ajouter</button>
           </div>
         </div>
-        <div class="form-group">
-          <label>Texte alternatif (alt)</label>
-          <input type="text" id="gallery-alt" placeholder="Description de l'image">
+        <div class="form-row">
+          <div class="form-group">
+            <label>…ou URL d'une image</label>
+            <input type="url" id="gallery-url" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label>Description (texte alternatif)</label>
+            <input type="text" id="gallery-alt" placeholder="Ex. : Mariage — sortie de cérémonie">
+          </div>
         </div>
+        <div class="upload-status" id="gallery-status"></div>
       </div>
 
       <div class="section-card">
@@ -501,20 +493,31 @@ a { text-decoration: none; color: inherit; }
 
       <div class="section-card" id="add-video-form" style="display:none;">
         <h3>Nouvelle vidéo</h3>
-        <div class="form-row three">
-          <div class="form-group">
-            <label>URL de la vignette</label>
-            <input type="url" id="video-url" placeholder="https://picsum.photos/seed/...">
-          </div>
+        <div class="form-row">
           <div class="form-group">
             <label>Titre</label>
             <input type="text" id="video-title" placeholder="Mariage — Clara & Marc">
+          </div>
+          <div class="form-group">
+            <label>Lien de la vidéo (YouTube, Vimeo, TikTok…)</label>
+            <input type="url" id="video-link" placeholder="https://...">
+          </div>
+        </div>
+        <div class="form-row three">
+          <div class="form-group">
+            <label>Vignette depuis l'appareil</label>
+            <input type="file" id="video-file" accept="image/*">
+          </div>
+          <div class="form-group">
+            <label>…ou URL de la vignette</label>
+            <input type="url" id="video-url" placeholder="https://...">
           </div>
           <div class="form-group">
             <label>&nbsp;</label>
             <button class="btn btn-accent" id="save-video" style="width:100%;">Ajouter</button>
           </div>
         </div>
+        <div class="upload-status" id="video-status"></div>
       </div>
 
       <div class="section-card" id="video-list"></div>
@@ -548,8 +551,8 @@ a { text-decoration: none; color: inherit; }
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>URL photo (avatar)</label>
-            <input type="url" id="testimonial-avatar" placeholder="https://picsum.photos/seed/...">
+            <label>Photo du client (optionnelle)</label>
+            <input type="file" id="testimonial-file" accept="image/*">
           </div>
           <div class="form-group">
             <label>Nombre d'étoiles</label>
@@ -705,7 +708,7 @@ a { text-decoration: none; color: inherit; }
         <div class="setting-row">
           <div>
             <div class="label">Statut des données</div>
-            <div class="desc"><span id="data-status-dot" class="status-dot active"></span> <span id="data-status-text">Prêtes dans le navigateur</span></div>
+            <div class="desc"><span id="data-status-dot" class="status-dot active"></span> <span id="data-status-text">Chargement…</span></div>
           </div>
         </div>
         <div class="setting-row">
@@ -718,40 +721,27 @@ a { text-decoration: none; color: inherit; }
         <div class="setting-row">
           <div>
             <div class="label">Importer les données</div>
-            <div class="desc">Restaure une sauvegarde JSON</div>
+            <div class="desc">Restaure le contenu (galerie, vidéos, témoignages) d'une sauvegarde JSON</div>
           </div>
           <button class="btn btn-outline btn-sm" id="import-data">Importer</button>
         </div>
         <div class="setting-row">
           <div>
             <div class="label">Réinitialiser</div>
-            <div class="desc">Remet les données par défaut du site</div>
+            <div class="desc">Vide la galerie, les vidéos et les témoignages (les demandes sont conservées)</div>
           </div>
           <button class="btn btn-danger btn-sm" id="reset-data">Réinitialiser</button>
         </div>
         <input type="file" id="file-input" accept=".json" style="display:none;">
       </div>
 
-      <div class="section-card">
-        <h3>Sécurité</h3>
-        <div class="setting-row">
-          <div>
-            <div class="label">Changer le mot de passe</div>
-            <div class="desc">Nouveau mot de passe pour l'accès administrateur</div>
-          </div>
-        </div>
-        <div class="form-group" style="margin-top:8px;">
-          <input type="password" id="new-password" placeholder="Nouveau mot de passe" style="width:100%;padding:10px 14px;border:1px solid #D4CEC4;border-radius:8px;background:#fff;font-size:0.9rem;">
-        </div>
-        <button class="btn btn-outline btn-sm" id="change-password">Changer le mot de passe</button>
-      </div>
 
       <div class="section-card">
         <h3>Informations</h3>
         <div class="setting-row">
           <div>
             <div class="label">Version du site</div>
-            <div class="desc">Les modifications sont sauvegardées dans votre navigateur</div>
+            <div class="desc">Les modifications sont enregistrées sur le serveur et visibles immédiatement sur le site</div>
           </div>
           <span style="font-size:0.8rem;color:#8C8C8C;">v2.0</span>
         </div>
@@ -767,113 +757,96 @@ a { text-decoration: none; color: inherit; }
 (function() {
   'use strict';
 
-  const STORAGE_KEY = 'rs_data';
-  const PASSWORD_KEY = 'rs_admin_pass';
-  const DEFAULT_PASSWORD = 'admin123';
-
-  const DEFAULT_DATA = {
-    gallery: [
-      { id: 'w1', url: 'https://picsum.photos/seed/w1/800/1000', category: 'mariage', alt: 'Mariage — Cérémonie en extérieur' },
-      { id: 'w2', url: 'https://picsum.photos/seed/w2/600/600', category: 'mariage', alt: 'Mariage — Photo de couple' },
-      { id: 'b1', url: 'https://picsum.photos/seed/b1/600/600', category: 'anniversaire', alt: 'Anniversaire — Photo de groupe' },
-      { id: 'p1', url: 'https://picsum.photos/seed/p1/600/600', category: 'portrait', alt: 'Portrait professionnel' },
-      { id: 'b2', url: 'https://picsum.photos/seed/b2/1200/600', category: 'anniversaire', alt: 'Anniversaire — Décoration' },
-      { id: 'p2', url: 'https://picsum.photos/seed/p2/600/600', category: 'portrait', alt: 'Portrait en extérieur' },
-      { id: 'w3', url: 'https://picsum.photos/seed/w3/800/1000', category: 'mariage', alt: 'Mariage — Réception' },
-      { id: 'b3', url: 'https://picsum.photos/seed/b3/600/600', category: 'anniversaire', alt: 'Anniversaire — Gâteau' },
-      { id: 'p3', url: 'https://picsum.photos/seed/p3/600/600', category: 'portrait', alt: 'Portrait studio' }
-    ],
-    videos: [],
-    testimonials: [],
-    bookings: []
-  };
-
-  function ensureDataShape(d) {
-    if (!d || typeof d !== 'object') return JSON.parse(JSON.stringify(DEFAULT_DATA));
-    if (!Array.isArray(d.gallery) && !Array.isArray(d.videos) && !Array.isArray(d.testimonials) && !Array.isArray(d.bookings)) return JSON.parse(JSON.stringify(DEFAULT_DATA));
-    if (!Array.isArray(d.gallery)) d.gallery = [];
-    if (!Array.isArray(d.videos)) d.videos = [];
-    if (!Array.isArray(d.testimonials)) d.testimonials = [];
-    if (!Array.isArray(d.bookings)) d.bookings = [];
-    return d;
-  }
-
-  function loadData() {
-    try {
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        var parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object') return ensureDataShape(parsed);
-      }
-    } catch(e) {}
-    return JSON.parse(JSON.stringify(DEFAULT_DATA));
-  }
-
-  function saveData(data) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    toast('Modifications enregistrées', 'success');
-    renderAll();
-  }
+  // Accès protégé par Caddy (basic auth sur /admin.html et /api/admin/*).
+  // Toutes les données vivent sur le serveur : ce qui est modifié ici est visible
+  // immédiatement par tous les visiteurs du site.
+  var data = { gallery: [], videos: [], testimonials: [], bookings: [] };
 
   function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
-  var data = loadData();
-  // Repair localStorage if it was corrupted, so index.html gets clean data
-  try {
-    var rawCheck = localStorage.getItem(STORAGE_KEY);
-    if (rawCheck) {
-      var parsedCheck = JSON.parse(rawCheck);
-      if (JSON.stringify(ensureDataShape(parsedCheck)) !== rawCheck) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      }
-    } else {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-  } catch(e) {};
-
-  // ==================== AUTH ====================
-  var loginOverlay = document.getElementById('login-overlay');
-  var appShell = document.getElementById('app-shell');
-  var loginPass = document.getElementById('login-pass');
-  var loginBtn = document.getElementById('login-btn');
-  var loginError = document.getElementById('login-error');
-
-  function getPassword() {
-    return localStorage.getItem(PASSWORD_KEY) || DEFAULT_PASSWORD;
+  function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function(c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
   }
 
-  function checkAuth() {
-    if (sessionStorage.getItem('rs_admin') === '1') {
-      loginOverlay.classList.add('hidden');
-      appShell.style.display = 'flex';
-      document.documentElement.style.display = '';
-      return true;
+  function api(method, url, body, contentType) {
+    var opts = { method: method, headers: {}, cache: 'no-store' };
+    if (body !== undefined) {
+      opts.headers['Content-Type'] = contentType || 'application/json';
+      opts.body = contentType ? body : JSON.stringify(body);
     }
-    loginOverlay.classList.remove('hidden');
-    appShell.style.display = 'none';
-    document.documentElement.style.display = '';
-    return false;
+    // location.origin : évite l'erreur fetch quand l'URL de la page contient des identifiants (user:pass@)
+    return fetch(location.origin + url, opts).then(function(r) {
+      return r.json().catch(function() { return {}; }).then(function(j) {
+        if (!r.ok) throw new Error(j.error || ('HTTP ' + r.status));
+        return j;
+      });
+    });
   }
 
-  loginBtn.addEventListener('click', function() {
-    var pw = loginPass.value;
-    if (pw === getPassword()) {
-      sessionStorage.setItem('rs_admin', '1');
-      loginError.classList.remove('show');
-      loginPass.value = '';
-      if (checkAuth()) renderAll();
-    } else {
-      loginError.classList.add('show');
-    }
-  });
+  function reload() {
+    return api('GET', '/api/admin/data').then(function(d) {
+      data.gallery = d.gallery || [];
+      data.videos = d.videos || [];
+      data.testimonials = d.testimonials || [];
+      data.bookings = d.bookings || [];
+      renderAll();
+    }).catch(function(err) {
+      toast('Impossible de charger les données : ' + err.message, 'error');
+    });
+  }
 
-  loginPass.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') loginBtn.click();
-  });
+  // Enregistre galerie / vidéos / témoignages (les demandes ont leurs propres routes)
+  function saveContent() {
+    renderAll();
+    return api('PUT', '/api/admin/content', {
+      gallery: data.gallery, videos: data.videos, testimonials: data.testimonials
+    }).then(function() {
+      toast('Modifications enregistrées — visibles sur le site', 'success');
+    }).catch(function(err) {
+      toast('Erreur d\'enregistrement : ' + err.message, 'error');
+      reload();
+    });
+  }
 
-  function logout() {
-    sessionStorage.removeItem('rs_admin');
-    checkAuth();
+  function bookingAction(method, url, body) {
+    return api(method, url, body).then(function() {
+      toast('Modifications enregistrées', 'success');
+      return reload();
+    }).catch(function(err) { toast('Erreur : ' + err.message, 'error'); });
+  }
+
+  // Redimensionne côté navigateur (photos de téléphone = plusieurs Mo) puis envoie.
+  // Résout { url, width, height }.
+  function uploadImage(file, maxDim) {
+    maxDim = maxDim || 2000;
+    return new Promise(function(resolve, reject) {
+      var img = new Image();
+      var objUrl = URL.createObjectURL(file);
+      img.onload = function() {
+        URL.revokeObjectURL(objUrl);
+        var scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+        var w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale);
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(function(blob) {
+          if (!blob) return reject(new Error('conversion impossible'));
+          api('POST', '/api/admin/upload', blob, 'image/jpeg').then(function(r) {
+            resolve({ url: r.url, width: w, height: h });
+          }, reject);
+        }, 'image/jpeg', 0.85);
+      };
+      img.onerror = function() { URL.revokeObjectURL(objUrl); reject(new Error('format d\'image non lisible')); };
+      img.src = objUrl;
+    });
+  }
+
+  function setStatus(id, msg, isError) {
+    var el = document.getElementById(id);
+    el.textContent = msg || '';
+    el.className = 'upload-status' + (isError ? ' error' : '');
   }
 
   // === TOAST ===
@@ -899,12 +872,9 @@ a { text-decoration: none; color: inherit; }
     });
   });
 
-  document.getElementById('logout-btn').addEventListener('click', function(e) {
-    e.preventDefault();
-    logout();
-  });
-
   // ==================== GALLERY ====================
+  var CAT_LABELS = { mariage: 'Mariage', anniversaire: 'Anniversaire', portrait: 'Portrait' };
+
   function renderGallery() {
     var grid = document.getElementById('gallery-grid');
     var empty = document.getElementById('gallery-empty');
@@ -921,13 +891,13 @@ a { text-decoration: none; color: inherit; }
       var card = document.createElement('div');
       card.className = 'gallery-card';
       card.innerHTML =
-        '<img src="' + item.url + '" alt="' + (item.alt || '') + '" loading="lazy">' +
+        '<img src="' + esc(item.url) + '" alt="' + esc(item.alt) + '" loading="lazy">' +
         '<div class="actions">' +
           (idx > 0 ? '<button class="move" data-action="move-up" data-idx="' + idx + '" title="Déplacer vers la gauche"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>' : '') +
           (idx < data.gallery.length - 1 ? '<button class="move" data-action="move-down" data-idx="' + idx + '" title="Déplacer vers la droite"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>' : '') +
-          '<button class="del" data-action="delete" data-id="' + item.id + '" title="Supprimer"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
+          '<button class="del" data-action="delete" data-id="' + esc(item.id) + '" title="Supprimer"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
         '</div>' +
-        '<div class="info"><span class="cat">' + item.category + '</span><span style="font-size:0.7rem;color:#8C8C8C;">#' + (idx + 1) + '</span></div>';
+        '<div class="info"><span class="cat">' + esc(CAT_LABELS[item.category] || item.category) + (item.demo ? ' · démo' : '') + '</span><span style="font-size:0.7rem;color:#8C8C8C;">#' + (idx + 1) + '</span></div>';
       grid.appendChild(card);
     });
   }
@@ -938,15 +908,47 @@ a { text-decoration: none; color: inherit; }
   });
 
   document.getElementById('save-gallery').addEventListener('click', function() {
+    var btn = this;
+    var filesInput = document.getElementById('gallery-files');
+    var files = Array.prototype.slice.call(filesInput.files || []);
     var url = document.getElementById('gallery-url').value.trim();
     var cat = document.getElementById('gallery-cat').value;
     var alt = document.getElementById('gallery-alt').value.trim();
-    if (!url) { toast('Veuillez entrer une URL', 'error'); return; }
-    data.gallery = data.gallery || [];
-    data.gallery.push({ id: genId(), url: url, category: cat, alt: alt || '' });
-    saveData(data);
-    document.getElementById('gallery-url').value = '';
-    document.getElementById('gallery-alt').value = '';
+    if (!files.length && !url) { toast('Choisissez des photos ou entrez une URL', 'error'); return; }
+
+    if (!files.length) {
+      data.gallery.push({ id: genId(), url: url, category: cat, alt: alt });
+      document.getElementById('gallery-url').value = '';
+      document.getElementById('gallery-alt').value = '';
+      saveContent();
+      return;
+    }
+
+    // Envoi séquentiel pour ménager la connexion mobile
+    btn.disabled = true;
+    var done = 0, failed = 0;
+    files.reduce(function(p, file) {
+      return p.then(function() {
+        setStatus('gallery-status', 'Envoi ' + (done + failed + 1) + ' / ' + files.length + '…');
+        return uploadImage(file).then(function(r) {
+          // Format choisi d'après les proportions : portrait = haute, paysage = large
+          data.gallery.push({
+            id: genId(), url: r.url, category: cat, alt: alt,
+            tall: r.height > r.width * 1.2, wide: r.width > r.height * 1.4
+          });
+          done++;
+        }, function(err) {
+          failed++;
+          toast(file.name + ' : ' + err.message, 'error');
+        });
+      });
+    }, Promise.resolve()).then(function() {
+      btn.disabled = false;
+      filesInput.value = '';
+      document.getElementById('gallery-alt').value = '';
+      setStatus('gallery-status', done + ' photo(s) ajoutée(s)' + (failed ? ', ' + failed + ' en erreur' : ''), failed > 0);
+      if (done) saveContent();
+    });
   });
 
   document.getElementById('gallery-grid').addEventListener('click', function(e) {
@@ -956,23 +958,15 @@ a { text-decoration: none; color: inherit; }
     if (action === 'delete') {
       var id = btn.getAttribute('data-id');
       data.gallery = data.gallery.filter(function(i) { return i.id !== id; });
-      saveData(data);
-    } else if (action === 'move-up') {
+      saveContent();
+    } else if (action === 'move-up' || action === 'move-down') {
       var idx = parseInt(btn.getAttribute('data-idx'), 10);
-      if (idx > 0) {
-        var tmp = data.gallery[idx];
-        data.gallery[idx] = data.gallery[idx - 1];
-        data.gallery[idx - 1] = tmp;
-        saveData(data);
-      }
-    } else if (action === 'move-down') {
-      var idx2 = parseInt(btn.getAttribute('data-idx'), 10);
-      if (idx2 < data.gallery.length - 1) {
-        var tmp2 = data.gallery[idx2];
-        data.gallery[idx2] = data.gallery[idx2 + 1];
-        data.gallery[idx2 + 1] = tmp2;
-        saveData(data);
-      }
+      var to = action === 'move-up' ? idx - 1 : idx + 1;
+      if (to < 0 || to >= data.gallery.length) return;
+      var tmp = data.gallery[idx];
+      data.gallery[idx] = data.gallery[to];
+      data.gallery[to] = tmp;
+      saveContent();
     }
   });
 
@@ -993,9 +987,10 @@ a { text-decoration: none; color: inherit; }
       var card = document.createElement('div');
       card.className = 'video-card';
       card.innerHTML =
-        '<img src="' + item.url + '" alt="" loading="lazy">' +
-        '<div class="info"><strong>' + item.label + '</strong></div>' +
-        '<button class="btn btn-danger btn-sm" data-id="' + item.id + '" data-action="del-video">Supprimer</button>';
+        (item.url ? '<img src="' + esc(item.url) + '" alt="" loading="lazy">' : '') +
+        '<div class="info"><strong>' + esc(item.label) + '</strong>' +
+          (item.link ? '<span>' + esc(item.link) + '</span>' : '<span style="color:#DC2626">Pas de lien vidéo</span>') + '</div>' +
+        '<button class="btn btn-danger btn-sm" data-id="' + esc(item.id) + '" data-action="del-video">Supprimer</button>';
       list.appendChild(card);
     });
   }
@@ -1006,14 +1001,23 @@ a { text-decoration: none; color: inherit; }
   });
 
   document.getElementById('save-video').addEventListener('click', function() {
-    var url = document.getElementById('video-url').value.trim();
+    var btn = this;
     var label = document.getElementById('video-title').value.trim();
-    if (!url || !label) { toast('Veuillez remplir tous les champs', 'error'); return; }
-    data.videos = data.videos || [];
-    data.videos.push({ id: genId(), url: url, label: label, alt: 'Vidéo — ' + label });
-    saveData(data);
-    document.getElementById('video-url').value = '';
-    document.getElementById('video-title').value = '';
+    var link = document.getElementById('video-link').value.trim();
+    var url = document.getElementById('video-url').value.trim();
+    var file = document.getElementById('video-file').files[0];
+    if (!label || !link) { toast('Titre et lien de la vidéo obligatoires', 'error'); return; }
+    btn.disabled = true;
+    setStatus('video-status', file ? 'Envoi de la vignette…' : '');
+    var thumb = file ? uploadImage(file, 1280).then(function(r) { return r.url; }) : Promise.resolve(url);
+    thumb.then(function(thumbUrl) {
+      data.videos.push({ id: genId(), url: thumbUrl, link: link, label: label, alt: 'Vidéo — ' + label });
+      ['video-title', 'video-link', 'video-url', 'video-file'].forEach(function(id) { document.getElementById(id).value = ''; });
+      setStatus('video-status', '');
+      return saveContent();
+    }, function(err) {
+      setStatus('video-status', 'Vignette : ' + err.message, true);
+    }).then(function() { btn.disabled = false; });
   });
 
   document.getElementById('video-list').addEventListener('click', function(e) {
@@ -1022,7 +1026,7 @@ a { text-decoration: none; color: inherit; }
     if (btn.getAttribute('data-action') === 'del-video') {
       var id = btn.getAttribute('data-id');
       data.videos = data.videos.filter(function(i) { return i.id !== id; });
-      saveData(data);
+      saveContent();
     }
   });
 
@@ -1045,9 +1049,9 @@ a { text-decoration: none; color: inherit; }
       var card = document.createElement('div');
       card.className = 'video-card';
       card.innerHTML =
-        '<img src="' + item.avatar + '" alt="" style="width:44px;height:44px;border-radius:50%;" loading="lazy">' +
-        '<div class="info"><strong>' + item.name + '</strong><span>' + item.event + ' · ' + stars + '</span></div>' +
-        '<button class="btn btn-danger btn-sm" data-id="' + item.id + '" data-action="del-testimonial">Supprimer</button>';
+        (item.avatar ? '<img src="' + esc(item.avatar) + '" alt="" style="width:44px;height:44px;border-radius:50%;" loading="lazy">' : '') +
+        '<div class="info"><strong>' + esc(item.name) + '</strong><span>' + esc(item.event) + ' · ' + stars + '</span></div>' +
+        '<button class="btn btn-danger btn-sm" data-id="' + esc(item.id) + '" data-action="del-testimonial">Supprimer</button>';
       list.appendChild(card);
     });
   }
@@ -1058,19 +1062,22 @@ a { text-decoration: none; color: inherit; }
   });
 
   document.getElementById('save-testimonial').addEventListener('click', function() {
+    var btn = this;
     var name = document.getElementById('testimonial-name').value.trim();
     var event = document.getElementById('testimonial-event').value.trim();
-    var avatar = document.getElementById('testimonial-avatar').value.trim();
+    var file = document.getElementById('testimonial-file').files[0];
     var stars = parseInt(document.getElementById('testimonial-stars').value, 10);
     var text = document.getElementById('testimonial-text').value.trim();
     if (!name || !text) { toast('Veuillez remplir le nom et le témoignage', 'error'); return; }
-    data.testimonials = data.testimonials || [];
-    data.testimonials.push({ id: genId(), name: name, event: event, avatar: avatar || 'https://picsum.photos/seed/' + genId() + '/100/100', stars: stars, text: text });
-    saveData(data);
-    document.getElementById('testimonial-name').value = '';
-    document.getElementById('testimonial-event').value = '';
-    document.getElementById('testimonial-avatar').value = '';
-    document.getElementById('testimonial-text').value = '';
+    btn.disabled = true;
+    var avatar = file ? uploadImage(file, 300).then(function(r) { return r.url; }) : Promise.resolve('');
+    avatar.then(function(avatarUrl) {
+      data.testimonials.push({ id: genId(), name: name, event: event, avatar: avatarUrl, stars: stars, text: text });
+      ['testimonial-name', 'testimonial-event', 'testimonial-file', 'testimonial-text'].forEach(function(id) { document.getElementById(id).value = ''; });
+      return saveContent();
+    }, function(err) {
+      toast('Photo : ' + err.message, 'error');
+    }).then(function() { btn.disabled = false; });
   });
 
   document.getElementById('testimonial-list').addEventListener('click', function(e) {
@@ -1079,7 +1086,7 @@ a { text-decoration: none; color: inherit; }
     if (btn.getAttribute('data-action') === 'del-testimonial') {
       var id = btn.getAttribute('data-id');
       data.testimonials = data.testimonials.filter(function(i) { return i.id !== id; });
-      saveData(data);
+      saveContent();
     }
   });
 
@@ -1088,7 +1095,7 @@ a { text-decoration: none; color: inherit; }
     var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'readystudio-data-backup.json';
+    a.download = 'readystudio-data-backup-' + new Date().toISOString().slice(0, 10) + '.json';
     a.click();
     toast('Données exportées', 'success');
   });
@@ -1104,13 +1111,12 @@ a { text-decoration: none; color: inherit; }
     reader.onload = function(ev) {
       try {
         var imported = JSON.parse(ev.target.result);
-        if (imported && typeof imported === 'object') {
-          data = ensureDataShape(imported);
-          saveData(data);
-          toast('Données importées avec succès', 'success');
-        } else {
-          toast('Fichier invalide', 'error');
-        }
+        if (!imported || typeof imported !== 'object') throw new Error();
+        if (!confirm('Remplacer la galerie, les vidéos et les témoignages actuels par ceux du fichier ?')) return;
+        data.gallery = Array.isArray(imported.gallery) ? imported.gallery : [];
+        data.videos = Array.isArray(imported.videos) ? imported.videos : [];
+        data.testimonials = Array.isArray(imported.testimonials) ? imported.testimonials : [];
+        saveContent().then(reload);
       } catch(err) {
         toast('Fichier JSON invalide', 'error');
       }
@@ -1120,19 +1126,12 @@ a { text-decoration: none; color: inherit; }
   });
 
   document.getElementById('reset-data').addEventListener('click', function() {
-    if (confirm('Réinitialiser toutes les données ? Cette action est irréversible.')) {
-      data = JSON.parse(JSON.stringify(DEFAULT_DATA));
-      saveData(data);
-      toast('Données réinitialisées', 'success');
+    if (confirm('Vider la galerie, les vidéos et les témoignages ? Cette action est irréversible (pensez à exporter avant).')) {
+      data.gallery = [];
+      data.videos = [];
+      data.testimonials = [];
+      saveContent();
     }
-  });
-
-  document.getElementById('change-password').addEventListener('click', function() {
-    var newPw = document.getElementById('new-password').value.trim();
-    if (newPw.length < 4) { toast('Minimum 4 caractères', 'error'); return; }
-    localStorage.setItem(PASSWORD_KEY, newPw);
-    document.getElementById('new-password').value = '';
-    toast('Mot de passe modifié avec succès', 'success');
   });
 
   // ==================== RENDER ALL ====================
@@ -1140,10 +1139,6 @@ a { text-decoration: none; color: inherit; }
     renderGallery();
     renderVideos();
     renderTestimonials();
-    var glen = data.gallery ? data.gallery.length : 0;
-    var vlen = data.videos ? data.videos.length : 0;
-    var tlen = data.testimonials ? data.testimonials.length : 0;
-    document.getElementById('data-status-text').textContent = glen + ' photos, ' + vlen + ' vidéos, ' + tlen + ' témoignages';
   }
 
   // ==================== TRAVEL MATRIX ====================
@@ -1304,9 +1299,8 @@ a { text-decoration: none; color: inherit; }
     var status = document.getElementById('booking-status').value;
     var message = document.getElementById('booking-message').value.trim();
     if (!name || !eventDate) { toast('Veuillez remplir le nom et la date', 'error'); return; }
-    data.bookings = data.bookings || [];
     var newBooking = {
-      id: 'b' + Date.now(),
+      id: 'new',
       clientName: name,
       email: email || '',
       eventType: eventType || 'Non spécifié',
@@ -1322,8 +1316,7 @@ a { text-decoration: none; color: inherit; }
       var msgs = check.conflicts.map(function(c) { return '⚠ ' + c.msg; }).join('\n\n');
       if (!confirm('Conflits détectés :\n\n' + msgs + '\n\nAjouter quand même ?')) return;
     }
-    data.bookings.push(newBooking);
-    saveData(data);
+    bookingAction('POST', '/api/admin/bookings', newBooking);
     document.getElementById('booking-name').value = '';
     document.getElementById('booking-email').value = '';
     document.getElementById('booking-event').value = '';
@@ -1467,7 +1460,7 @@ a { text-decoration: none; color: inherit; }
     if (warnings.length > 0) {
       var warnBanner = document.createElement('div');
       warnBanner.className = 'travel-warning';
-      warnBanner.innerHTML = '⚠ ' + warnings.map(function(w) { return w.msg; }).join('<br>⚠ ');
+      warnBanner.innerHTML = '⚠ ' + warnings.map(function(w) { return esc(w.msg); }).join('<br>⚠ ');
       list.appendChild(warnBanner);
     }
 
@@ -1477,15 +1470,15 @@ a { text-decoration: none; color: inherit; }
       card.className = 'booking-card' + (hasWarning ? ' warning' : '');
       card.innerHTML =
         '<div class="info">' +
-          '<strong>' + b.clientName + '</strong>' +
-          '<span>' + (b.eventType || 'Événement') + ' · ' + (b.country || 'France') + ' · ' + (b.duration || '') + ' · ' + b.email + '</span>' +
-          '<span style="display:block;font-size:0.72rem;color:#A3A3A3;margin-top:2px;">' + (b.message || '') + '</span>' +
+          '<strong>' + esc(b.clientName) + '</strong>' +
+          '<span>' + esc(b.eventType || 'Événement') + ' · ' + esc(b.country || 'France') + ' · ' + esc(b.duration) + ' · ' + mailLink(b.email) + '</span>' +
+          '<span style="display:block;font-size:0.72rem;color:#A3A3A3;margin-top:2px;white-space:pre-wrap;">' + esc(b.message) + '</span>' +
         '</div>' +
         '<span class="badge ' + statusClass(b.status) + '">' + (b.status === 'confirmed' ? 'Confirmé' : b.status === 'cancelled' ? 'Annulé' : 'En attente') + '</span>' +
         '<div class="actions">' +
-          (b.status === 'pending' ? '<button class="btn btn-sm btn-primary" data-action="confirm-booking" data-id="' + b.id + '" title="Confirmer">✓</button>' : '') +
-          (b.status !== 'cancelled' ? '<button class="btn btn-sm btn-danger" data-action="cancel-booking" data-id="' + b.id + '" title="Annuler">✕</button>' : '') +
-          '<button class="btn btn-sm btn-outline" data-action="delete-booking" data-id="' + b.id + '" title="Supprimer définitivement" style="color:#DC2626;border-color:#FECACA;">🗑</button>' +
+          (b.status === 'pending' ? '<button class="btn btn-sm btn-primary" data-action="confirm-booking" data-id="' + esc(b.id) + '" title="Confirmer">✓</button>' : '') +
+          (b.status !== 'cancelled' ? '<button class="btn btn-sm btn-danger" data-action="cancel-booking" data-id="' + esc(b.id) + '" title="Annuler">✕</button>' : '') +
+          '<button class="btn btn-sm btn-outline" data-action="delete-booking" data-id="' + esc(b.id) + '" title="Supprimer définitivement" style="color:#DC2626;border-color:#FECACA;">🗑</button>' +
         '</div>';
       list.appendChild(card);
     });
@@ -1508,21 +1501,21 @@ a { text-decoration: none; color: inherit; }
     if (!btn) return;
     var action = btn.getAttribute('data-action');
     var id = btn.getAttribute('data-id');
+    var url = '/api/admin/bookings/' + encodeURIComponent(id);
     if (action === 'confirm-booking') {
-      var b = data.bookings.find(function(x) { return x.id === id; });
-      if (b) { b.status = 'confirmed'; saveData(data); }
+      bookingAction('PATCH', url, { status: 'confirmed' });
     } else if (action === 'cancel-booking') {
-      var b2 = data.bookings.find(function(x) { return x.id === id; });
-      if (b2) { b2.status = 'cancelled'; saveData(data); }
+      bookingAction('PATCH', url, { status: 'cancelled' });
     } else if (action === 'delete-booking') {
-      if (confirm('Supprimer définitivement cette réservation ?')) {
-        data.bookings = data.bookings.filter(function(x) { return x.id !== id; });
-        saveData(data);
-      }
+      if (confirm('Supprimer définitivement cette réservation ?')) bookingAction('DELETE', url);
     }
   }
   document.getElementById('cal-detail-list').addEventListener('click', handleBookingAction);
   document.getElementById('all-bookings').addEventListener('click', handleBookingAction);
+
+  function mailLink(email) {
+    return email ? '<a href="mailto:' + esc(email) + '" style="color:inherit;text-decoration:underline;">' + esc(email) + '</a>' : '';
+  }
 
   function renderAllBookings() {
     var list = document.getElementById('all-bookings');
@@ -1544,16 +1537,16 @@ a { text-decoration: none; color: inherit; }
       card.className = 'booking-card' + (hasWarning ? ' warning' : '');
       card.innerHTML =
         '<div class="info">' +
-          '<strong>' + b.clientName + ' <span style="font-weight:400;color:#8C8C8C;font-size:0.75rem;">— ' + b.eventDate + '</span></strong>' +
-          '<span>' + (b.eventType || 'Événement') + ' · ' + (b.country || 'France') + ' · ' + (b.duration || '') + ' · ' + b.email + '</span>' +
-          '<span style="display:block;font-size:0.72rem;color:#A3A3A3;margin-top:2px;">' + (b.message || '') + '</span>' +
-          (hasWarning ? '<div class="travel-detail">⚠ ' + warnMsg + '</div>' : '') +
+          '<strong>' + esc(b.clientName) + ' <span style="font-weight:400;color:#8C8C8C;font-size:0.75rem;">— ' + esc(b.eventDate) + '</span></strong>' +
+          '<span>' + esc(b.eventType || 'Événement') + ' · ' + esc(b.country || 'France') + ' · ' + esc(b.duration) + ' · ' + mailLink(b.email) + '</span>' +
+          '<span style="display:block;font-size:0.72rem;color:#A3A3A3;margin-top:2px;white-space:pre-wrap;">' + esc(b.message) + '</span>' +
+          (hasWarning ? '<div class="travel-detail">⚠ ' + esc(warnMsg) + '</div>' : '') +
         '</div>' +
         '<span class="badge ' + statusClass(b.status) + '">' + (b.status === 'confirmed' ? 'Confirmé' : b.status === 'cancelled' ? 'Annulé' : 'En attente') + '</span>' +
         '<div class="actions">' +
-          (b.status === 'pending' ? '<button class="btn btn-sm btn-primary" data-action="confirm-booking" data-id="' + b.id + '">✓</button>' : '') +
-          (b.status !== 'cancelled' ? '<button class="btn btn-sm btn-danger" data-action="cancel-booking" data-id="' + b.id + '">✕</button>' : '') +
-          '<button class="btn btn-sm btn-outline" data-action="delete-booking" data-id="' + b.id + '" style="color:#DC2626;border-color:#FECACA;">🗑</button>' +
+          (b.status === 'pending' ? '<button class="btn btn-sm btn-primary" data-action="confirm-booking" data-id="' + esc(b.id) + '">✓</button>' : '') +
+          (b.status !== 'cancelled' ? '<button class="btn btn-sm btn-danger" data-action="cancel-booking" data-id="' + esc(b.id) + '">✕</button>' : '') +
+          '<button class="btn btn-sm btn-outline" data-action="delete-booking" data-id="' + esc(b.id) + '" style="color:#DC2626;border-color:#FECACA;">🗑</button>' +
         '</div>';
       list.appendChild(card);
     });
@@ -1572,9 +1565,8 @@ a { text-decoration: none; color: inherit; }
     document.getElementById('data-status-text').textContent = glen + ' photos, ' + vlen + ' vidéos, ' + tlen + ' témoignages, ' + blen + ' réservations';
   };
 
-  if (checkAuth()) renderAll();
+  reload();
 
-  window.__data = data;
 })();
 </script>
 </body>
