@@ -1058,6 +1058,8 @@ footer p { font-size: 0.75rem; line-height: 1.6; }
           <label for="message" data-i18n="form-message">Message</label>
           <textarea id="message" name="message" required data-i18n-placeholder="form-message-placeholder" placeholder="Parlez-moi de votre projet..."></textarea>
         </div>
+        <!-- Champ piège anti-robots : invisible pour les humains -->
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
         <button type="submit" class="submit-btn" data-i18n="form-submit">Envoyer via WhatsApp</button>
         <p class="form-hint" data-i18n="form-hint">Votre demande s'ouvrira dans WhatsApp, pré-remplie : il ne vous restera qu'à l'envoyer.</p>
       </form>
@@ -1100,56 +1102,15 @@ footer p { font-size: 0.75rem; line-height: 1.6; }
   // ==============================
   // DATA
   // ==============================
-  var STORAGE_KEY = 'rs_data';
+  // Le contenu (galerie, vidéos, témoignages) est servi par l'API (/api/data),
+  // alimentée depuis l'admin. Rendu vide tant qu'elle n'a pas répondu.
+  var data = { gallery: [], videos: [], testimonials: [] };
 
-  var DEFAULT_DATA = {
-    gallery: [
-      { id: 'w1', url: 'https://picsum.photos/seed/w1/800/1000', category: 'mariage', alt: 'Mariage — Cérémonie en extérieur', tall: true },
-      { id: 'w2', url: 'https://picsum.photos/seed/w2/600/600', category: 'mariage', alt: 'Mariage — Photo de couple' },
-      { id: 'b1', url: 'https://picsum.photos/seed/b1/600/600', category: 'anniversaire', alt: 'Anniversaire — Photo de groupe' },
-      { id: 'p1', url: 'https://picsum.photos/seed/p1/600/600', category: 'portrait', alt: 'Portrait professionnel' },
-      { id: 'b2', url: 'https://picsum.photos/seed/b2/1200/600', category: 'anniversaire', alt: 'Anniversaire — Décoration', wide: true },
-      { id: 'p2', url: 'https://picsum.photos/seed/p2/600/600', category: 'portrait', alt: 'Portrait en extérieur' },
-      { id: 'w3', url: 'https://picsum.photos/seed/w3/800/1000', category: 'mariage', alt: 'Mariage — Réception', tall: true },
-      { id: 'b3', url: 'https://picsum.photos/seed/b3/600/600', category: 'anniversaire', alt: 'Anniversaire — Gâteau' },
-      { id: 'p3', url: 'https://picsum.photos/seed/p3/600/600', category: 'portrait', alt: 'Portrait studio' }
-    ],
-    // Pas de vidéos ni de témoignages tant que les vrais contenus ne sont pas fournis :
-    // les sections correspondantes sont masquées quand ces listes sont vides.
-    videos: [],
-    testimonials: [],
-    bookings: []
-  };
-
-  function ensureDataShape(d) {
-    if (!d || typeof d !== 'object') return JSON.parse(JSON.stringify(DEFAULT_DATA));
-    if (!Array.isArray(d.gallery) && !Array.isArray(d.videos) && !Array.isArray(d.testimonials) && !Array.isArray(d.bookings)) return JSON.parse(JSON.stringify(DEFAULT_DATA));
-    if (!Array.isArray(d.gallery)) d.gallery = [];
-    if (!Array.isArray(d.videos)) d.videos = [];
-    if (!Array.isArray(d.testimonials)) d.testimonials = [];
-    if (!Array.isArray(d.bookings)) d.bookings = [];
-    return d;
+  function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function(c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
   }
-
-  function loadData() {
-    try {
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        var parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object') return ensureDataShape(parsed);
-      }
-    } catch(e) {}
-    return JSON.parse(JSON.stringify(DEFAULT_DATA));
-  }
-
-  var data = loadData();
-  // Auto-repair localStorage if data was corrupted
-  try {
-    var rawCheck = localStorage.getItem(STORAGE_KEY);
-    if (!rawCheck || JSON.stringify(ensureDataShape(JSON.parse(rawCheck))) !== rawCheck) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-  } catch(e) {}
 
   // ==============================
   // I18N
@@ -1305,15 +1266,17 @@ footer p { font-size: 0.75rem; line-height: 1.6; }
   function renderGallery() {
     var grid = document.getElementById('gallery-grid');
     grid.innerHTML = '';
-    if (!data.gallery || !data.gallery.length) return;
+    // Bandeau « photos d'illustration » tant qu'il reste une photo de démo
+    document.querySelector('.demo-notice').hidden = !data.gallery.some(function(g) { return g.demo; });
+    if (!data.gallery.length) return;
     data.gallery.forEach(function(item) {
       var div = document.createElement('div');
       div.className = 'grid-item aperture-visible' + (item.tall ? ' tall' : '') + (item.wide ? ' wide' : '');
       div.setAttribute('role', 'listitem');
       div.setAttribute('data-category', item.category);
       div.innerHTML =
-        '<img src="' + item.url + '" alt="" data-i18n-alt="' + item.alt + '" loading="lazy">' +
-        '<div class="overlay"><span data-i18n="' + categoryLabels[item.category] + '">' + item.category + '</span></div>';
+        '<img src="' + esc(item.url) + '" alt="' + esc(item.alt) + '" loading="lazy">' +
+        '<div class="overlay"><span data-i18n="' + categoryLabels[item.category] + '">' + esc(item.category) + '</span></div>';
       grid.appendChild(div);
     });
     // re-apply i18n for overlay text
@@ -1321,10 +1284,6 @@ footer p { font-size: 0.75rem; line-height: 1.6; }
     grid.querySelectorAll('[data-i18n]').forEach(function(el) {
       var key = el.getAttribute('data-i18n');
       if (tr[key]) el.textContent = tr[key];
-    });
-    // re-apply alt texts
-    grid.querySelectorAll('[data-i18n-alt]').forEach(function(el) {
-      el.setAttribute('alt', el.getAttribute('data-i18n-alt'));
     });
     // re-bind lightbox
     bindLightbox();
@@ -1378,9 +1337,12 @@ footer p { font-size: 0.75rem; line-height: 1.6; }
       var div = document.createElement('div');
       div.className = 'video-card reveal ' + delay;
       div.innerHTML =
-        '<img src="' + item.url + '" alt="" data-i18n-alt="' + item.alt + '" loading="lazy">' +
+        (item.url ? '<img src="' + esc(item.url) + '" alt="' + esc(item.alt) + '" loading="lazy">' : '') +
         '<div class="video-play"><svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg></div>' +
-        '<span class="label">' + item.label + '</span>';
+        '<span class="label">' + esc(item.label) + '</span>';
+      if (item.link) {
+        div.addEventListener('click', function() { window.open(item.link, '_blank', 'noopener'); });
+      }
       grid.appendChild(div);
       requestAnimationFrame(function() { div.classList.add('visible'); });
     });
@@ -1403,10 +1365,10 @@ footer p { font-size: 0.75rem; line-height: 1.6; }
       div.className = 'testimonial-card reveal ' + delay;
       div.innerHTML =
         '<div class="stars">' + stars + '</div>' +
-        '<blockquote>' + item.text + '</blockquote>' +
+        '<blockquote>' + esc(item.text) + '</blockquote>' +
         '<div class="testimonial-author">' +
-          '<img src="' + item.avatar + '" alt="" loading="lazy">' +
-          '<div><strong>' + item.name + '</strong><span>' + item.event + '</span></div>' +
+          (item.avatar ? '<img src="' + esc(item.avatar) + '" alt="" loading="lazy">' : '') +
+          '<div><strong>' + esc(item.name) + '</strong><span>' + esc(item.event) + '</span></div>' +
         '</div>';
       grid.appendChild(div);
       requestAnimationFrame(function() { div.classList.add('visible'); });
@@ -1612,15 +1574,41 @@ footer p { font-size: 0.75rem; line-height: 1.6; }
       tr['wa-message'] + ' :',
       message
     ];
+    // Enregistre aussi la demande dans l'admin. keepalive : la requête part même si
+    // l'ouverture de WhatsApp fait quitter la page ; window.open reste synchrone
+    // pour ne pas être bloqué comme popup.
+    fetch('/api/booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({
+        clientName: name, email: email, eventType: eventType, eventDate: eventDate,
+        country: countrySelect.value, duration: durationSelect.value, message: message,
+        website: document.getElementById('website').value
+      })
+    }).catch(function() {});
+    this.reset();
     window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(lines.join('\n')), '_blank', 'noopener');
   });
 
   // ==============================
   // INIT
   // ==============================
-  renderGallery();
-  renderVideos();
-  renderTestimonials();
+  function renderContent() {
+    renderGallery();
+    renderVideos();
+    renderTestimonials();
+  }
+  renderContent();
+  fetch('/api/data', { cache: 'no-store' })
+    .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(d) {
+      data.gallery = Array.isArray(d.gallery) ? d.gallery : [];
+      data.videos = Array.isArray(d.videos) ? d.videos : [];
+      data.testimonials = Array.isArray(d.testimonials) ? d.testimonials : [];
+      renderContent();
+    })
+    .catch(function() { /* API indisponible : sections vides/masquées */ });
 
   var dateInput = document.getElementById('event-date');
   if (dateInput) {
