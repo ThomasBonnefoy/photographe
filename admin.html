@@ -45,9 +45,13 @@ a { text-decoration: none; color: inherit; }
   background: #fff; font-size: 0.9rem;
 }
 .login-box input:focus { border-color: #C4A06A; outline: none; box-shadow: 0 0 0 3px rgba(196,160,106,0.2); }
-.login-box .btn { width: 100%; padding: 12px; margin-top: 8px; }
+.login-box .btn { width: 100%; padding: 12px; margin-top: 8px; justify-content: center; text-align: center; }
 .login-error { color: #D94A4A; font-size: 0.8rem; margin-top: 8px; text-align: center; display: none; }
 .login-error.show { display: block; }
+.login-logo { width: 96px; height: 96px; object-fit: cover; border-radius: 12px; margin: 0 auto 20px; display: block; }
+.login-box h1, .login-box > p { text-align: center; }
+.login-back { display: block; text-align: center; margin-top: 20px; font-size: 0.8rem; color: #8C8C8C; }
+.login-back:hover { color: #1A1A1A; }
 
 /* === LAYOUT === */
 .app { display: flex; min-height: 100vh; }
@@ -392,7 +396,26 @@ a { text-decoration: none; color: inherit; }
 </head>
 <body>
 
-<div class="app" id="app-shell">
+<div id="login-overlay" class="hidden">
+  <form class="login-box" id="login-form" novalidate>
+    <img src="img/logo.jpeg" alt="Ready Studio" class="login-logo">
+    <h1>Espace Ready Studio</h1>
+    <p>Connectez-vous pour gérer votre site.</p>
+    <div class="form-group">
+      <label for="login-user">Identifiant</label>
+      <input type="text" id="login-user" autocomplete="username" autocapitalize="none" required>
+    </div>
+    <div class="form-group">
+      <label for="login-pass">Mot de passe</label>
+      <input type="password" id="login-pass" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="btn btn-primary" id="login-btn">Se connecter</button>
+    <div class="login-error" id="login-error" role="alert"></div>
+    <a href="index.html" class="login-back">← Retour au site</a>
+  </form>
+</div>
+
+<div class="app" id="app-shell" style="display:none;">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
@@ -423,6 +446,10 @@ a { text-decoration: none; color: inherit; }
     <a href="index.html" class="back">
       <svg viewBox="0 0 24 24"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
       Retour au site
+    </a>
+    <a href="#" id="logout-btn" class="back" style="border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;margin-top:4px;">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Déconnexion
     </a>
   </aside>
 
@@ -737,6 +764,27 @@ a { text-decoration: none; color: inherit; }
 
 
       <div class="section-card">
+        <h3>Sécurité</h3>
+        <div class="setting-row">
+          <div>
+            <div class="label">Changer le mot de passe</div>
+            <div class="desc">8 caractères minimum. Les autres appareils connectés seront déconnectés.</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="current-password">Mot de passe actuel</label>
+            <input type="password" id="current-password" autocomplete="current-password">
+          </div>
+          <div class="form-group">
+            <label for="new-password">Nouveau mot de passe</label>
+            <input type="password" id="new-password" autocomplete="new-password">
+          </div>
+        </div>
+        <button class="btn btn-outline btn-sm" id="change-password">Changer le mot de passe</button>
+      </div>
+
+      <div class="section-card">
         <h3>Informations</h3>
         <div class="setting-row">
           <div>
@@ -757,7 +805,7 @@ a { text-decoration: none; color: inherit; }
 (function() {
   'use strict';
 
-  // Accès protégé par Caddy (basic auth sur /admin.html et /api/admin/*).
+  // Connexion via le formulaire intégré (cookie de session posé par l'API).
   // Toutes les données vivent sur le serveur : ce qui est modifié ici est visible
   // immédiatement par tous les visiteurs du site.
   var data = { gallery: [], videos: [], testimonials: [], bookings: [] };
@@ -779,6 +827,7 @@ a { text-decoration: none; color: inherit; }
     // location.origin : évite l'erreur fetch quand l'URL de la page contient des identifiants (user:pass@)
     return fetch(location.origin + url, opts).then(function(r) {
       return r.json().catch(function() { return {}; }).then(function(j) {
+        if (r.status === 401 && url.indexOf('/api/admin/') === 0) showLogin('Session expirée, reconnectez-vous.');
         if (!r.ok) throw new Error(j.error || ('HTTP ' + r.status));
         return j;
       });
@@ -848,6 +897,57 @@ a { text-decoration: none; color: inherit; }
     el.textContent = msg || '';
     el.className = 'upload-status' + (isError ? ' error' : '');
   }
+
+  // ==================== CONNEXION ====================
+  var loginOverlay = document.getElementById('login-overlay');
+  var appShell = document.getElementById('app-shell');
+  var loginError = document.getElementById('login-error');
+
+  function showLogin(msg) {
+    appShell.style.display = 'none';
+    loginOverlay.classList.remove('hidden');
+    loginError.textContent = msg || '';
+    loginError.classList.toggle('show', !!msg);
+    document.getElementById(document.getElementById('login-user').value ? 'login-pass' : 'login-user').focus();
+  }
+
+  function showApp() {
+    loginOverlay.classList.add('hidden');
+    appShell.style.display = '';
+    reload();
+  }
+
+  document.getElementById('login-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var btn = document.getElementById('login-btn');
+    var pass = document.getElementById('login-pass');
+    btn.disabled = true;
+    api('POST', '/api/login', {
+      username: document.getElementById('login-user').value.trim(),
+      password: pass.value
+    }).then(function() {
+      pass.value = '';
+      loginError.classList.remove('show');
+      showApp();
+    }, function(err) {
+      showLogin(err.message);
+      pass.select();
+    }).then(function() { btn.disabled = false; });
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    api('POST', '/api/logout', {}).catch(function() {}).then(function() { showLogin(); });
+  });
+
+  document.getElementById('change-password').addEventListener('click', function() {
+    var cur = document.getElementById('current-password');
+    var nw = document.getElementById('new-password');
+    api('POST', '/api/admin/password', { current: cur.value, 'new': nw.value }).then(function() {
+      cur.value = ''; nw.value = '';
+      toast('Mot de passe modifié', 'success');
+    }, function(err) { toast(err.message, 'error'); });
+  });
 
   // === TOAST ===
   var toastEl = document.getElementById('toast');
@@ -1565,7 +1665,9 @@ a { text-decoration: none; color: inherit; }
     document.getElementById('data-status-text').textContent = glen + ' photos, ' + vlen + ' vidéos, ' + tlen + ' témoignages, ' + blen + ' réservations';
   };
 
-  reload();
+  api('GET', '/api/session').then(function(s) {
+    if (s.authenticated) showApp(); else showLogin();
+  }, function() { showLogin('Serveur injoignable.'); });
 
 })();
 </script>
